@@ -1,1 +1,3 @@
 wordfreq
+fastapi
+uvicorn[standard]
