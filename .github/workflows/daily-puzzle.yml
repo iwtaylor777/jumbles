@@ -1,0 +1,40 @@
+name: Generate Daily Puzzle
+
+on:
+  schedule:
+    - cron: '5 0 * * *'   # 00:05 UTC every day
+  workflow_dispatch:       # manual “Run workflow” button
+
+permissions:
+  contents: write          # allow pushing commits
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Generate puzzle
+        run: python src/generator.py
+
+      - name: Commit & push puzzle
+        run: |
+          git config --global user.name 'Puzzle Bot'
+          git config --global user.email 'bot@jumbles.app'
+          git add puzzles/*.json
+          git commit -m "chore: add daily puzzle [skip ci]" || echo "No changes to commit"
+          git push
+
