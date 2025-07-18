@@ -1,3 +1,5 @@
 wordfreq
 fastapi
 uvicorn[standard]
+fastapi
+uvicorn[standard]
