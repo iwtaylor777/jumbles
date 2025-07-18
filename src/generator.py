@@ -1,51 +1,74 @@
-import random
+# src/generator.py
+"""
+Daily Jumbles puzzle generator
+------------------------------
+• Expects a text file  data/words5.txt  (one 5-letter word per line, lowercase)
+• Creates/updates   puzzles/YYYY-MM-DD.json
+    {
+      "id": "2025-07-18",
+      "grid": [["R","A","E","L","E"], ...],
+      "solution": ["FRAIL","CIDER","TRACK","LEAFY"]
+    }
+"""
+
 from pathlib import Path
+import random
 import json
-from wordfreq import top_n_list
+import datetime as dt
+import sys
 
-WORD_COUNT_PER_PUZZLE = 4
-WORD_LENGTH = 5
-PUZZLE_DIR = Path(__file__).parent.parent / "puzzles"
+# ---------- Constants ---------------------------------------------------
 
+ROOT        = Path(__file__).parent.parent          # repo root
+WORD_FILE   = ROOT / "data" / "words5.txt"
+PUZZLE_DIR  = ROOT / "puzzles"
 
-def get_word_list(limit=5000):
-    """Return a cleaned list of common 5-letter words."""
-    raw = top_n_list("en", limit)
-    return [w.upper() for w in raw if len(w) == WORD_LENGTH and w.isalpha()]
+WORD_COUNT  = 4
+WORD_LEN    = 5
 
+# ---------- Load word list ---------------------------------------------
 
-def choose_words(words, k=WORD_COUNT_PER_PUZZLE):
-    return random.sample(words, k=k)
+try:
+    WORDS = [w.strip().upper() for w in WORD_FILE.read_text().splitlines() if len(w.strip()) == WORD_LEN]
+except FileNotFoundError:
+    sys.exit(f"[generator] Cannot find word list at {WORD_FILE}")
 
+if len(WORDS) < 1000:
+    sys.exit("[generator] Word list looks too small; aborting.")
 
-def scramble(words):
-    letters = [c for w in words for c in w]
+# ---------- Helper functions -------------------------------------------
+
+def choose_words() -> list[str]:
+    """Pick 4 distinct words."""
+    return random.sample(WORDS, WORD_COUNT)
+
+def scramble(words: list[str]) -> list[list[str]]:
+    """Return a 4×5 scrambled grid guaranteed not to start solved."""
+    flat = [ch for w in words for ch in w]          # 20 letters
     while True:
-        random.shuffle(letters)
-        grid = [letters[i*WORD_LENGTH:(i+1)*WORD_LENGTH] for i in range(WORD_COUNT_PER_PUZZLE)]
-        # ensure not already solved
-        if all(''.join(row) not in words for row in grid):
+        random.shuffle(flat)
+        grid = [flat[i * WORD_LEN : (i + 1) * WORD_LEN] for i in range(WORD_COUNT)]
+        if all("".join(row) not in words for row in grid):   # not already solved
             return grid
 
+# ---------- Main generator ---------------------------------------------
 
-def generate_puzzle():
-    wordlist = get_word_list()
-    solution = choose_words(wordlist)
-    grid = scramble(solution)
-    return {"solution": solution, "grid": grid}
+def generate_puzzle() -> dict:
+    solution = choose_words()
+    grid     = scramble(solution)
+    return {"id": dt.date.today().isoformat(),
+            "grid": grid,
+            "solution": solution}
 
-
-def save_puzzle(puzzle, date_str):
+def save(puzzle: dict) -> Path:
     PUZZLE_DIR.mkdir(exist_ok=True)
-    path = PUZZLE_DIR / f"{date_str}.json"
-    with path.open("w") as f:
-        json.dump(puzzle, f, indent=2)
-    print(f"Puzzle saved to {path.relative_to(Path.cwd())}")
+    path = PUZZLE_DIR / f"{puzzle['id']}.json"
+    path.write_text(json.dumps(puzzle, indent=2))
+    return path
 
+# ---------- CLI entry ---------------------------------------------------
 
 if __name__ == "__main__":
-    import datetime as dt
-    today = dt.date.today().isoformat()
-    puzzle = generate_puzzle()
-    save_puzzle(puzzle, today)
+    puzzle_path = save(generate_puzzle())
+    print(f"[generator] Puzzle written → {puzzle_path.relative_to(ROOT)}")
 
