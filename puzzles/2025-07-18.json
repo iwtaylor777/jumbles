@@ -1,37 +1,37 @@
 {
   "solution": [
-    "ISSUE",
-    "PANTS",
-    "GIVEN",
-    "VALID"
+    "MOUSE",
+    "DAVID",
+    "ACTED",
+    "LOVER"
   ],
   "grid": [
     [
-      "G",
-      "L",
-      "A",
+      "E",
+      "C",
+      "S",
       "I",
-      "N"
+      "V"
     ],
     [
-      "I",
-      "T",
-      "S",
+      "R",
       "V",
+      "O",
+      "M",
       "U"
+    ],
+    [
+      "O",
+      "D",
+      "T",
+      "D",
+      "L"
     ],
     [
       "A",
       "D",
-      "I",
-      "S",
-      "V"
-    ],
-    [
-      "P",
-      "S",
       "E",
-      "N",
+      "A",
       "E"
     ]
   ]
