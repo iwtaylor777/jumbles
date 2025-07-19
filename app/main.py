@@ -15,7 +15,7 @@ app.add_middleware(
         # local dev
         "http://localhost:5173",
         # every *.vercel.app preview build
-        "https://*.vercel.app",
+        "https://jumbles.vercel.app",
         # optionally your custom domain
         "https://jumblesgame.com",
     ],
