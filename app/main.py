@@ -11,7 +11,14 @@ app = FastAPI(title="Jumbles API", version="0.1.0")
 # --- CORS (update origins once you know your frontend host) ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],           # dev: open; prod: set to your domain
+    allow_origins=[
+        # local dev
+        "http://localhost:5173",
+        # every *.vercel.app preview build
+        "https://*.vercel.app",
+        # optionally your custom domain
+        "https://jumblesgame.com",
+    ],
     allow_methods=["GET"],
     allow_headers=["*"],
 )
