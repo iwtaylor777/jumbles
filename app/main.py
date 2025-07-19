@@ -32,7 +32,11 @@ def get_today_puzzle():
     path = PUZZLE_DIR / f"{today}.json"
 
     if not path.exists():
-        raise HTTPException(status_code=404, detail="Today's puzzle not found")
+        # fallback one day back
+        yday = (dt.date.today() - dt.timedelta(days=1)).isoformat()
+        path = PUZZLE_DIR / f"{yday}.json"
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Puzzle not found")
 
     with path.open() as f:
         data = json.load(f)

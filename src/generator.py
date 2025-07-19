@@ -38,6 +38,7 @@ if len(WORDS) < 1000:
 
 # ---------- Helper functions -------------------------------------------
 
+
 def choose_words() -> list[str]:
     """Pick 4 distinct words."""
     return random.sample(WORDS, WORD_COUNT)
@@ -60,6 +61,11 @@ def generate_puzzle() -> dict:
             "grid": grid,
             "solution": solution}
 
+def generate_puzzle_for_date(d: dt.date) -> dict:
+    solution = choose_words()
+    grid = scramble(solution)
+    return {"id": d.isoformat(), "grid": grid, "solution": solution}
+
 def save(puzzle: dict) -> Path:
     PUZZLE_DIR.mkdir(exist_ok=True)
     path = PUZZLE_DIR / f"{puzzle['id']}.json"
@@ -69,6 +75,11 @@ def save(puzzle: dict) -> Path:
 # ---------- CLI entry ---------------------------------------------------
 
 if __name__ == "__main__":
-    puzzle_path = save(generate_puzzle())
-    print(f"[generator] Puzzle written → {puzzle_path.relative_to(ROOT)}")
+    utc_today = dt.datetime.utcnow().date()
+    utc_yday  = utc_today - dt.timedelta(days=1)
 
+    for day in (utc_yday, utc_today):
+        puzzle = generate_puzzle_for_date(day)
+        save(puzzle)          # your existing save() already names file <id>.json
+
+    print("[generator] Wrote puzzles for", utc_yday, "and", utc_today)
