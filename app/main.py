@@ -1,50 +1,39 @@
-import json
-import datetime as dt
-from pathlib import Path
+# app/main.py  ----------------------------------------------------
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from pathlib import Path
+import datetime as dt, json
 
-PUZZLE_DIR = Path(__file__).parent.parent / "puzzles"
+PUZZLE_DIR = Path(__file__).resolve().parent.parent / "puzzles"
 
-app = FastAPI(title="Jumbles API", version="0.1.0")
+class Puzzle(BaseModel):
+    id: str
+    grid: list[list[str]]
+    solution: list[str]
 
-# --- CORS (update origins once you know your frontend host) ---
+app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        # local dev
-        "http://localhost:5173",
-        # every *.vercel.app preview build
-        "https://jumbles.vercel.app",
-        # optionally your custom domain
-        "https://jumblesgame.com",
-    ],
+    allow_origins=["*"],      # or restrict to your front‑end origin
     allow_methods=["GET"],
     allow_headers=["*"],
 )
 
-# ------------------- ROUTES -------------------
+# ---------- helper ------------------------------------------------
+def _load(date: str) -> dict:
+    file = PUZZLE_DIR / f"{date}.json"
+    if not file.exists():
+        raise HTTPException(status_code=404, detail="Not Found")
+    return json.loads(file.read_text())
 
-@app.get("/puzzle/today")
-def get_today_puzzle():
-    """Return today's puzzle JSON (without the solution)."""
-    today = dt.date.today().isoformat()
-    path = PUZZLE_DIR / f"{today}.json"
+# ---------- routes ------------------------------------------------
+@app.get("/puzzle/{date}", response_model=Puzzle)
+def by_date(date: str):
+    return _load(date)
 
-    if not path.exists():
-        # fallback one day back
-        yday = (dt.date.today() - dt.timedelta(days=1)).isoformat()
-        path = PUZZLE_DIR / f"{yday}.json"
-    if not path.exists():
-        raise HTTPException(status_code=404, detail="Puzzle not found")
+@app.get("/puzzle/today", response_model=Puzzle)
+def today():
+    return _load(dt.date.today().isoformat())
 
-    with path.open() as f:
-        data = json.load(f)
-
-    # hide the answers before sending to the client
-    data_filtered = {
-        "id": today,
-        "grid": data["grid"],
-    }
-    return data_filtered
 
