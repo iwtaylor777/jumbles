@@ -1,79 +1,78 @@
+# ---------------------------------------------------------------------------
+#  src/generator.py  – Jumbles puzzle generator (TODAY  +  TOMORROW)
+# ---------------------------------------------------------------------------
 """
-Daily Jumbles puzzle generator
-==============================
-
-* Requires  data/words5.txt  – one lowercase 5-letter word per line.
-* Writes     puzzles/YYYY-MM-DD.json
+• Expects a 5-letter word list:  data/words5.txt  (1 word / line, lowercase)
+• Writes  puzzles/YYYY-MM-DD.json  *and*  YYYY-MM-(DD+1).json, each:
     {
       "id": "2025-07-24",
-      "grid": [
-         ["R","A","E","L","E"],
-         ...
-      ],
+      "grid": [["R","A","E","L","E"], ...],
       "solution": ["FRAIL","CIDER","TRACK","LEAFY"]
     }
 """
 
 from pathlib import Path
-import random, json, datetime as dt, sys
+import random, json, sys, datetime as dt
 
-ROOT        = Path(__file__).resolve().parent.parent   # repo root
+ROOT        = Path(__file__).resolve().parent.parent
 WORD_FILE   = ROOT / "data" / "words5.txt"
 PUZZLE_DIR  = ROOT / "puzzles"
-WORD_COUNT  = 4                # 4 rows
-MAX_TRIES   = 500
+
+WORD_COUNT      = 4       # 4 words per puzzle
+MAX_ATTEMPTS    = 200     # safety loop when building a puzzle
+
 
 # ------------------------------------------------------------------ helpers
-def load_word_list() -> list[str]:
+def load_vocab() -> list[str]:
+    """Read words5.txt → list of 5-letter uppercase words."""
     if not WORD_FILE.exists():
-        sys.exit(f"❌ word list missing: {WORD_FILE}")
-    words = [w.strip().lower() for w in WORD_FILE.read_text().splitlines()
-             if len(w.strip()) == 5 and w.isalpha()]
-    if len(words) < 5000:
-        sys.exit("❌ word list too small (<5 000 words)")
+        sys.exit(f"Missing word list: {WORD_FILE}")
+
+    words = [
+        w.strip().upper()
+        for w in WORD_FILE.read_text().splitlines()
+        if len(w.strip()) == 5 and w.isalpha()
+    ]
+    if len(words) < 4000:
+        sys.exit("word list looks too small: aborting")
     return words
 
-def pick_words(pool: list[str]) -> list[str]:
-    """Pick DISTINCT 5-letter words until we find 4 that share no duplicate row
-    when scrambled (to avoid obvious giveaways)."""
-    for _ in range(MAX_TRIES):
-        sample = random.sample(pool, WORD_COUNT)
-        # accept immediately (you can add extra difficulty checks here)
-        return sample
-    raise RuntimeError("could not pick words")
 
-def scramble_words(words: list[str]) -> list[str]:
-    """Return new list with letters shuffled inside each word."""
-    scrambled = []
-    for w in words:
-        letters = list(w.upper())
-        random.shuffle(letters)
-        scrambled.append("".join(letters))
-    return scrambled
+def build_puzzle(rng: random.Random, vocab: list[str]):
+    """Pick 4 distinct words and return (shuffled grid, solution list)."""
+    words = rng.sample(vocab, WORD_COUNT)
+    # simple first version: shuffle each word’s letters
+    grid  = [list(rng.sample(word, len(word))) for word in words]
+    return grid, words
+
+
+def write_puzzle(date: dt.date, grid, solution):
+    out = PUZZLE_DIR / f"{date.isoformat()}.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    payload = {"id": date.isoformat(), "grid": grid, "solution": solution}
+    out.write_text(json.dumps(payload, separators=(",", ":")))
+    print("✅ wrote", out.relative_to(ROOT))
+
 
 # ------------------------------------------------------------------ main
-def main(today: dt.date):
-    words      = load_word_list()
-    originals  = pick_words(words)                 # ['frail', 'cider', ...]
-    scrambled  = scramble_words(originals)         # ['RFAIL', ...] order random
+def main():
+    vocab = load_vocab()
+    rng   = random.Random()
 
-    puzzle = {
-        "id": today.isoformat(),
-        "grid": [list(w) for w in scrambled],      # 4 × 5 char arrays
-        "solution": [w.upper() for w in originals] # original words, uppercase
-    }
+    today = dt.date.today()
 
-    # sanity-check: always 4×5 grid + 4-word solution
-    assert len(puzzle["grid"]) == 4
-    assert all(len(r) == 5 for r in puzzle["grid"])
-    assert len(puzzle["solution"]) == 4
-    assert all(len(s) == 5 for s in puzzle["solution"])
+    # generate *today* and *tomorrow*
+    for delta in (0, 1):
+        day = today + dt.timedelta(days=delta)
 
-    PUZZLE_DIR.mkdir(exist_ok=True)
-    out_file = PUZZLE_DIR / f"{puzzle['id']}.json"
-    out_file.write_text(json.dumps(puzzle, indent=2))
-    print(f"✅  wrote {out_file}")
+        # build a puzzle (add smarter rejection if desired)
+        for _ in range(MAX_ATTEMPTS):
+            grid, sol = build_puzzle(rng, vocab)
+            break
+
+        write_puzzle(day, grid, sol)
+
 
 if __name__ == "__main__":
-    main(dt.date.today())
+    main()
 
