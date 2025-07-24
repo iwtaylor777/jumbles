@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from pathlib import Path
 import datetime as dt, json
+import pytz
 
 PUZZLE_DIR = Path(__file__).resolve().parent.parent / "puzzles"
 
@@ -34,6 +35,7 @@ def by_date(date: str):
 
 @app.get("/puzzle/today", response_model=Puzzle)
 def today():
-    return _load(dt.date.today().isoformat())
+    local_date = dt.now(LOCAL_TZ).date()
+    return _load(local_date.isoformat())
 
 
