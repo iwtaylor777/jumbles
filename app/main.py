@@ -35,27 +35,23 @@ def _load(date_str: str) -> dict:
         raise HTTPException(status_code=404, detail="Not Found")
     return json.loads(p.read_text())
 
+# ─── TODAY FIRST ────────────────────────────────────────────────
+@app.get("/puzzle/today", response_model=Puzzle)
+def today():
+    local = datetime.now(LOCAL_TZ).date()
+    for d in (local, datetime.utcnow().date(), datetime.utcnow().date() - timedelta(days=1)):
+        iso = d.isoformat()
+        try:
+            return _load(iso)
+        except HTTPException:
+            continue
+    # if all fail, raise 404
+    raise HTTPException(status_code=404, detail="Not Found")
+
+# ─── THEN PARAMETERIZED ────────────────────────────────────────
 @app.get("/puzzle/{date}", response_model=Puzzle)
 def by_date(date: str):
     return _load(date)
-
-@app.get("/puzzle/today", response_model=Puzzle)
-def today():
-    # 1) try your local‐tz date
-    local_date = datetime.now(LOCAL_TZ).date()
-    try:
-        return _load(local_date.isoformat())
-    except HTTPException:
-        # 2) fallback to UTC date if different
-        utc_date = datetime.utcnow().date()
-        if utc_date != local_date:
-            try:
-                return _load(utc_date.isoformat())
-            except HTTPException:
-                pass
-        # 3) ultimate fallback: yesterday (UTC)
-        yest = (utc_date - timedelta(days=1)).isoformat()
-        return _load(yest)
 
 
 
