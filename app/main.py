@@ -35,7 +35,20 @@ def by_date(date: str):
 
 @app.get("/puzzle/today", response_model=Puzzle)
 def today():
+    # try local-tz date first …
     local_date = dt.now(LOCAL_TZ).date()
-    return _load(local_date.isoformat())
+    try:
+        return _load(local_date.isoformat())
+    except HTTPException:
+        # … then UTC date …
+        utc_date = dt.utcnow().date()
+        if utc_date != local_date:
+            try:
+                return _load(utc_date.isoformat())
+            except HTTPException:
+                pass
+        # … finally yesterday (last resort)
+        yest = (utc_date - timedelta(days=1)).isoformat()
+        return _load(yest)
 
 
