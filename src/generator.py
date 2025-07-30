@@ -15,7 +15,7 @@ from pathlib import Path
 import random, json, sys, datetime as dt
 
 ROOT        = Path(__file__).resolve().parent.parent
-WORD_FILE   = ROOT / "data" / "words5.txt"
+WORD_FILE   = ROOT / "data" / "words5_clean.txt"
 PUZZLE_DIR  = ROOT / "puzzles"
 
 WORD_COUNT      = 4       # 4 words per puzzle
