@@ -39,6 +39,7 @@ spics semen shits spunk twats wanks whore
 JUNK = set("""
 potus scuba radar sonar arpa fubar thats gonna wanna gotta yeah okay uhhuh
 malik prick horny sexed boobs kinky japan china texas romeo tokyo koran islam
+drunk booze boozy
 """.split())
 
 # names / brands that appear lowercase in Webster's 2nd and slip past propernames

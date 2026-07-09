@@ -8,7 +8,7 @@
         "circled": [
           2
         ],
-        "scramble": "RDERO"
+        "scramble": "RDORE"
       },
       {
         "answer": "BLACK",
@@ -51,13 +51,6 @@
     "date": "2026-07-10",
     "words": [
       {
-        "answer": "WOULD",
-        "circled": [
-          4
-        ],
-        "scramble": "OLDWU"
-      },
-      {
         "answer": "FLOOR",
         "circled": [
           2,
@@ -66,11 +59,11 @@
         "scramble": "LOFRO"
       },
       {
-        "answer": "WHILE",
+        "answer": "WOULD",
         "circled": [
-          1
+          4
         ],
-        "scramble": "ILEHW"
+        "scramble": "OLDWU"
       },
       {
         "answer": "MIGHT",
@@ -79,6 +72,13 @@
           4
         ],
         "scramble": "HGTIM"
+      },
+      {
+        "answer": "WHILE",
+        "circled": [
+          1
+        ],
+        "scramble": "ILEHW"
       }
     ],
     "bonus": {
@@ -96,6 +96,15 @@
     "date": "2026-07-11",
     "words": [
       {
+        "answer": "TAKEN",
+        "circled": [
+          0,
+          1,
+          4
+        ],
+        "scramble": "KTENA"
+      },
+      {
         "answer": "POWER",
         "circled": [
           0
@@ -103,27 +112,18 @@
         "scramble": "REPWO"
       },
       {
-        "answer": "WHICH",
-        "circled": [
-          3
-        ],
-        "scramble": "CIHHW"
-      },
-      {
-        "answer": "TAKEN",
-        "circled": [
-          0,
-          1,
-          4
-        ],
-        "scramble": "ETNAK"
-      },
-      {
         "answer": "ABOUT",
         "circled": [
           0
         ],
         "scramble": "OUATB"
+      },
+      {
+        "answer": "WHICH",
+        "circled": [
+          3
+        ],
+        "scramble": "CIHHW"
       }
     ],
     "bonus": {
@@ -169,7 +169,7 @@
         "circled": [
           4
         ],
-        "scramble": "OLDRW"
+        "scramble": "ODWRL"
       }
     ],
     "bonus": {
@@ -235,15 +235,7 @@
         "circled": [
           4
         ],
-        "scramble": "VENGI"
-      },
-      {
-        "answer": "HAPPY",
-        "circled": [
-          2,
-          3
-        ],
-        "scramble": "PHAYP"
+        "scramble": "NVEGI"
       },
       {
         "answer": "CROSS",
@@ -251,7 +243,7 @@
           0,
           2
         ],
-        "scramble": "RSSOC"
+        "scramble": "SSCOR"
       },
       {
         "answer": "WORKS",
@@ -259,7 +251,15 @@
           1,
           2
         ],
-        "scramble": "SKORW"
+        "scramble": "KSWOR"
+      },
+      {
+        "answer": "HAPPY",
+        "circled": [
+          2,
+          3
+        ],
+        "scramble": "PYAHP"
       }
     ],
     "bonus": {
@@ -279,32 +279,32 @@
         "answer": "KNOWN",
         "circled": [
           2,
-          4
+          3
         ],
-        "scramble": "NKNOW"
+        "scramble": "NWNKO"
       },
       {
         "answer": "BROWN",
         "circled": [
-          1,
-          3
+          0,
+          1
         ],
         "scramble": "ROWNB"
       },
       {
-        "answer": "GOING",
-        "circled": [
-          2
-        ],
-        "scramble": "OGGIN"
-      },
-      {
         "answer": "ABOVE",
         "circled": [
-          0,
-          1
+          0
         ],
-        "scramble": "OAVEB"
+        "scramble": "BEAOV"
+      },
+      {
+        "answer": "GOING",
+        "circled": [
+          2,
+          3
+        ],
+        "scramble": "IGNGO"
       }
     ],
     "bonus": {
@@ -343,7 +343,7 @@
           3,
           4
         ],
-        "scramble": "CMHTA"
+        "scramble": "HCMTA"
       },
       {
         "answer": "LIGHT",
@@ -367,26 +367,19 @@
     "date": "2026-07-17",
     "words": [
       {
-        "answer": "FRONT",
-        "circled": [
-          3
-        ],
-        "scramble": "TORFN"
-      },
-      {
         "answer": "VIDEO",
         "circled": [
           1,
           2,
           3
         ],
-        "scramble": "IDEOV"
+        "scramble": "IDOVE"
       },
       {
         "answer": "ADDED",
         "circled": [
           0,
-          1
+          4
         ],
         "scramble": "DADDE"
       },
@@ -397,6 +390,13 @@
           4
         ],
         "scramble": "ELITT"
+      },
+      {
+        "answer": "FRONT",
+        "circled": [
+          3
+        ],
+        "scramble": "NTROF"
       }
     ],
     "bonus": {
@@ -413,17 +413,10 @@
     "date": "2026-07-18",
     "words": [
       {
-        "answer": "OFTEN",
-        "circled": [
-          3
-        ],
-        "scramble": "ENFTO"
-      },
-      {
         "answer": "SENSE",
         "circled": [
           1,
-          3
+          4
         ],
         "scramble": "ESENS"
       },
@@ -434,6 +427,13 @@
           3
         ],
         "scramble": "EDOLM"
+      },
+      {
+        "answer": "STOCK",
+        "circled": [
+          0
+        ],
+        "scramble": "OCTKS"
       },
       {
         "answer": "WOMAN",
@@ -458,35 +458,35 @@
     "date": "2026-07-19",
     "words": [
       {
-        "answer": "CLASS",
+        "answer": "EVENT",
         "circled": [
-          2
-        ],
-        "scramble": "SASCL"
-      },
-      {
-        "answer": "CRAZY",
-        "circled": [
-          2
-        ],
-        "scramble": "YCZRA"
-      },
-      {
-        "answer": "SPENT",
-        "circled": [
-          1,
           3
         ],
-        "scramble": "TNSPE"
+        "scramble": "TENVE"
       },
       {
         "answer": "CHECK",
         "circled": [
+          0,
           2,
-          3,
           4
         ],
-        "scramble": "HCKEC"
+        "scramble": "HECKC"
+      },
+      {
+        "answer": "PIECE",
+        "circled": [
+          0
+        ],
+        "scramble": "IEPEC"
+      },
+      {
+        "answer": "AWARD",
+        "circled": [
+          0,
+          2
+        ],
+        "scramble": "WDRAA"
       }
     ],
     "bonus": {
@@ -503,36 +503,36 @@
     "date": "2026-07-20",
     "words": [
       {
-        "answer": "YOUNG",
-        "circled": [
-          2,
-          4
-        ],
-        "scramble": "UNYGO"
-      },
-      {
-        "answer": "COMES",
+        "answer": "FOCUS",
         "circled": [
           1,
           4
         ],
-        "scramble": "ECOSM"
+        "scramble": "CUFSO"
       },
       {
-        "answer": "LEVEL",
-        "circled": [
-          3
-        ],
-        "scramble": "EVLLE"
-      },
-      {
-        "answer": "HONDA",
+        "answer": "OFTEN",
         "circled": [
           0,
-          1,
           3
         ],
-        "scramble": "DNOAH"
+        "scramble": "TNFOE"
+      },
+      {
+        "answer": "YOUNG",
+        "circled": [
+          2
+        ],
+        "scramble": "OUYGN"
+      },
+      {
+        "answer": "DOUGH",
+        "circled": [
+          0,
+          3,
+          4
+        ],
+        "scramble": "GUOHD"
       }
     ],
     "bonus": {
@@ -549,36 +549,36 @@
     "date": "2026-07-21",
     "words": [
       {
-        "answer": "SWAMP",
+        "answer": "COMES",
+        "circled": [
+          1,
+          4
+        ],
+        "scramble": "SMECO"
+      },
+      {
+        "answer": "CRAZY",
+        "circled": [
+          2
+        ],
+        "scramble": "ACRYZ"
+      },
+      {
+        "answer": "SWEPT",
         "circled": [
           0,
           1,
-          2
+          3
         ],
-        "scramble": "MASPW"
+        "scramble": "WSPTE"
       },
       {
-        "answer": "PIECE",
-        "circled": [
-          0
-        ],
-        "scramble": "EPCEI"
-      },
-      {
-        "answer": "THIRD",
-        "circled": [
-          3,
-          4
-        ],
-        "scramble": "HTDIR"
-      },
-      {
-        "answer": "SORRY",
+        "answer": "ROUND",
         "circled": [
           0,
-          1
+          4
         ],
-        "scramble": "RRYOS"
+        "scramble": "UDNOR"
       }
     ],
     "bonus": {
@@ -595,36 +595,36 @@
     "date": "2026-07-22",
     "words": [
       {
+        "answer": "STYLE",
+        "circled": [
+          1,
+          3,
+          4
+        ],
+        "scramble": "TLESY"
+      },
+      {
         "answer": "ALBUM",
         "circled": [
-          0,
+          1,
           2,
           4
         ],
-        "scramble": "LUMAB"
+        "scramble": "BUAML"
       },
       {
-        "answer": "ALLOW",
-        "circled": [
-          0,
-          1,
-          2
-        ],
-        "scramble": "OAWLL"
-      },
-      {
-        "answer": "STOCK",
-        "circled": [
-          1
-        ],
-        "scramble": "TSKOC"
-      },
-      {
-        "answer": "GUESS",
+        "answer": "BLACK",
         "circled": [
           2
         ],
-        "scramble": "SSGEU"
+        "scramble": "LBKAC"
+      },
+      {
+        "answer": "CLASS",
+        "circled": [
+          2
+        ],
+        "scramble": "LSSAC"
       }
     ],
     "bonus": {
@@ -641,20 +641,12 @@
     "date": "2026-07-23",
     "words": [
       {
-        "answer": "STAFF",
+        "answer": "LEVEL",
         "circled": [
           0,
-          2
+          4
         ],
-        "scramble": "FFSTA"
-      },
-      {
-        "answer": "BUILT",
-        "circled": [
-          0,
-          3
-        ],
-        "scramble": "ITBUL"
+        "scramble": "VLELE"
       },
       {
         "answer": "SHOWN",
@@ -666,11 +658,19 @@
         "scramble": "WSNHO"
       },
       {
-        "answer": "STYLE",
+        "answer": "TRACK",
         "circled": [
-          3
+          2
         ],
-        "scramble": "LYEST"
+        "scramble": "CAKTR"
+      },
+      {
+        "answer": "BLESS",
+        "circled": [
+          0,
+          4
+        ],
+        "scramble": "SBSLE"
       }
     ],
     "bonus": {
@@ -687,36 +687,36 @@
     "date": "2026-07-24",
     "words": [
       {
-        "answer": "VOICE",
+        "answer": "WOULD",
         "circled": [
+          1,
           4
         ],
-        "scramble": "CEOVI"
+        "scramble": "DULOW"
       },
       {
-        "answer": "ENJOY",
+        "answer": "TAKEN",
         "circled": [
-          3
+          1,
+          2
         ],
-        "scramble": "NYOEJ"
+        "scramble": "ETNKA"
+      },
+      {
+        "answer": "EIGHT",
+        "circled": [
+          0
+        ],
+        "scramble": "IEHTG"
       },
       {
         "answer": "DERBY",
         "circled": [
-          0,
+          2,
           3,
           4
         ],
-        "scramble": "RBDYE"
-      },
-      {
-        "answer": "TRACK",
-        "circled": [
-          1,
-          2,
-          4
-        ],
-        "scramble": "KACRT"
+        "scramble": "RBYDE"
       }
     ],
     "bonus": {
@@ -733,13 +733,6 @@
     "date": "2026-07-25",
     "words": [
       {
-        "answer": "QUICK",
-        "circled": [
-          4
-        ],
-        "scramble": "UKQIC"
-      },
-      {
         "answer": "SKULL",
         "circled": [
           0,
@@ -748,21 +741,28 @@
         "scramble": "LULSK"
       },
       {
+        "answer": "QUICK",
+        "circled": [
+          2,
+          4
+        ],
+        "scramble": "CQUKI"
+      },
+      {
         "answer": "CHILD",
         "circled": [
           0,
           2,
           4
         ],
-        "scramble": "ILHDC"
+        "scramble": "ILDHC"
       },
       {
-        "answer": "RIVER",
+        "answer": "POWER",
         "circled": [
-          1,
           3
         ],
-        "scramble": "IERRV"
+        "scramble": "REOPW"
       }
     ],
     "bonus": {
@@ -779,36 +779,36 @@
     "date": "2026-07-26",
     "words": [
       {
-        "answer": "TRUMP",
-        "circled": [
-          1,
-          3
-        ],
-        "scramble": "MUPRT"
-      },
-      {
-        "answer": "AWAKE",
-        "circled": [
-          1,
-          3
-        ],
-        "scramble": "WKEAA"
-      },
-      {
         "answer": "BLOCK",
         "circled": [
           0,
-          2
-        ],
-        "scramble": "COBKL"
-      },
-      {
-        "answer": "PHOTO",
-        "circled": [
           2,
           4
         ],
-        "scramble": "HOTOP"
+        "scramble": "LCBKO"
+      },
+      {
+        "answer": "MONTH",
+        "circled": [
+          0,
+          1
+        ],
+        "scramble": "HNTMO"
+      },
+      {
+        "answer": "WATCH",
+        "circled": [
+          0
+        ],
+        "scramble": "HWCTA"
+      },
+      {
+        "answer": "WORLD",
+        "circled": [
+          1,
+          2
+        ],
+        "scramble": "LDORW"
       }
     ],
     "bonus": {
@@ -825,36 +825,36 @@
     "date": "2026-07-27",
     "words": [
       {
-        "answer": "BELLY",
+        "answer": "LEAVE",
+        "circled": [
+          4
+        ],
+        "scramble": "EAVEL"
+      },
+      {
+        "answer": "HOUSE",
+        "circled": [
+          1,
+          4
+        ],
+        "scramble": "UHEOS"
+      },
+      {
+        "answer": "BENCH",
         "circled": [
           0,
           1,
           4
         ],
-        "scramble": "LLYBE"
+        "scramble": "EHCNB"
       },
       {
-        "answer": "HEAVY",
-        "circled": [
-          0
-        ],
-        "scramble": "AVEYH"
-      },
-      {
-        "answer": "ROUND",
-        "circled": [
-          1,
-          3
-        ],
-        "scramble": "UNDRO"
-      },
-      {
-        "answer": "PEACE",
+        "answer": "ENJOY",
         "circled": [
           1,
           4
         ],
-        "scramble": "EAEPC"
+        "scramble": "JYENO"
       }
     ],
     "bonus": {
@@ -871,35 +871,35 @@
     "date": "2026-07-28",
     "words": [
       {
-        "answer": "UPPER",
+        "answer": "DRINK",
+        "circled": [
+          4
+        ],
+        "scramble": "KNRID"
+      },
+      {
+        "answer": "PEACE",
         "circled": [
           0,
           2,
           3
         ],
-        "scramble": "PRUPE"
+        "scramble": "CPEEA"
       },
       {
-        "answer": "CATCH",
+        "answer": "COUNT",
         "circled": [
           0,
-          3
-        ],
-        "scramble": "THCAC"
-      },
-      {
-        "answer": "BROKE",
-        "circled": [
-          3
-        ],
-        "scramble": "OBREK"
-      },
-      {
-        "answer": "IMAGE",
-        "circled": [
           2
         ],
-        "scramble": "EGIMA"
+        "scramble": "NTOUC"
+      },
+      {
+        "answer": "GIVEN",
+        "circled": [
+          3
+        ],
+        "scramble": "NVGIE"
       }
     ],
     "bonus": {
@@ -916,41 +916,683 @@
     "date": "2026-07-29",
     "words": [
       {
-        "answer": "EIGHT",
+        "answer": "ABOUT",
         "circled": [
-          1,
+          0,
           3,
           4
         ],
-        "scramble": "ITHGE"
+        "scramble": "UOBTA"
       },
       {
-        "answer": "CIVIL",
+        "answer": "MATCH",
         "circled": [
-          0
+          3
         ],
-        "scramble": "ICLVI"
+        "scramble": "HCMTA"
       },
       {
-        "answer": "FUNNY",
+        "answer": "THIRD",
+        "circled": [
+          1,
+          2
+        ],
+        "scramble": "HDRTI"
+      },
+      {
+        "answer": "GROUP",
         "circled": [
           1
         ],
-        "scramble": "YNUFN"
-      },
-      {
-        "answer": "AWARD",
-        "circled": [
-          2,
-          3
-        ],
-        "scramble": "WDRAA"
+        "scramble": "ROUPG"
       }
     ],
     "bonus": {
       "answer": "HAIRCUT",
       "display": "HAIRCUT",
       "clue": "A trim that can cost you a few locks",
+      "pattern": [
+        7
+      ]
+    }
+  },
+  {
+    "id": 22,
+    "date": "2026-07-30",
+    "words": [
+      {
+        "answer": "KNOWN",
+        "circled": [
+          1
+        ],
+        "scramble": "NONKW"
+      },
+      {
+        "answer": "SPENT",
+        "circled": [
+          2,
+          4
+        ],
+        "scramble": "ENTSP"
+      },
+      {
+        "answer": "FORCE",
+        "circled": [
+          0,
+          1
+        ],
+        "scramble": "CEFOR"
+      },
+      {
+        "answer": "PHOTO",
+        "circled": [
+          2,
+          3,
+          4
+        ],
+        "scramble": "OTPOH"
+      }
+    ],
+    "bonus": {
+      "answer": "FOOTNOTE",
+      "display": "FOOTNOTE",
+      "clue": "The fine print down at the bottom",
+      "pattern": [
+        8
+      ]
+    }
+  },
+  {
+    "id": 23,
+    "date": "2026-07-31",
+    "words": [
+      {
+        "answer": "ABOVE",
+        "circled": [
+          0
+        ],
+        "scramble": "BAVEO"
+      },
+      {
+        "answer": "ORDER",
+        "circled": [
+          2,
+          3,
+          4
+        ],
+        "scramble": "ROERD"
+      },
+      {
+        "answer": "SADLY",
+        "circled": [
+          1,
+          2,
+          4
+        ],
+        "scramble": "DSLYA"
+      },
+      {
+        "answer": "MIGHT",
+        "circled": [
+          0
+        ],
+        "scramble": "IMTGH"
+      }
+    ],
+    "bonus": {
+      "answer": "DAYDREAM",
+      "display": "DAYDREAM",
+      "clue": "A wandering mind's private matinee",
+      "pattern": [
+        8
+      ]
+    }
+  },
+  {
+    "id": 24,
+    "date": "2026-08-01",
+    "words": [
+      {
+        "answer": "FACED",
+        "circled": [
+          0,
+          1,
+          2
+        ],
+        "scramble": "EFDAC"
+      },
+      {
+        "answer": "WORKS",
+        "circled": [
+          3
+        ],
+        "scramble": "OKSWR"
+      },
+      {
+        "answer": "WHILE",
+        "circled": [
+          4
+        ],
+        "scramble": "ELWHI"
+      },
+      {
+        "answer": "BRING",
+        "circled": [
+          0,
+          1,
+          2
+        ],
+        "scramble": "NIBGR"
+      }
+    ],
+    "bonus": {
+      "answer": "BACKFIRE",
+      "display": "BACKFIRE",
+      "clue": "When a clever plan blows up on you",
+      "pattern": [
+        8
+      ]
+    }
+  },
+  {
+    "id": 25,
+    "date": "2026-08-02",
+    "words": [
+      {
+        "answer": "PRESS",
+        "circled": [
+          1,
+          2
+        ],
+        "scramble": "SSPRE"
+      },
+      {
+        "answer": "MODEL",
+        "circled": [
+          0,
+          1,
+          3
+        ],
+        "scramble": "LEMDO"
+      },
+      {
+        "answer": "LIGHT",
+        "circled": [
+          1,
+          4
+        ],
+        "scramble": "TGHIL"
+      },
+      {
+        "answer": "VIDEO",
+        "circled": [
+          0
+        ],
+        "scramble": "OVEDI"
+      }
+    ],
+    "bonus": {
+      "answer": "OVERTIME",
+      "display": "OVERTIME",
+      "clue": "Extra hours that pad the paycheck",
+      "pattern": [
+        8
+      ]
+    }
+  },
+  {
+    "id": 26,
+    "date": "2026-08-03",
+    "words": [
+      {
+        "answer": "CROWD",
+        "circled": [
+          0,
+          3,
+          4
+        ],
+        "scramble": "DCWOR"
+      },
+      {
+        "answer": "TITLE",
+        "circled": [
+          0
+        ],
+        "scramble": "IELTT"
+      },
+      {
+        "answer": "HAPPY",
+        "circled": [
+          0,
+          1
+        ],
+        "scramble": "PPYAH"
+      },
+      {
+        "answer": "GOING",
+        "circled": [
+          0,
+          1
+        ],
+        "scramble": "IGOGN"
+      }
+    ],
+    "bonus": {
+      "answer": "WATCHDOG",
+      "display": "WATCHDOG",
+      "clue": "A four-legged security system",
+      "pattern": [
+        8
+      ]
+    }
+  },
+  {
+    "id": 27,
+    "date": "2026-08-04",
+    "words": [
+      {
+        "answer": "ALBUM",
+        "circled": [
+          2
+        ],
+        "scramble": "MBALU"
+      },
+      {
+        "answer": "YOUNG",
+        "circled": [
+          0
+        ],
+        "scramble": "OGNYU"
+      },
+      {
+        "answer": "BUILT",
+        "circled": [
+          1,
+          3
+        ],
+        "scramble": "TLBIU"
+      },
+      {
+        "answer": "GUARD",
+        "circled": [
+          0,
+          2,
+          4
+        ],
+        "scramble": "DGRAU"
+      }
+    ],
+    "bonus": {
+      "answer": "LADYBUG",
+      "display": "LADYBUG",
+      "clue": "A polka-dotted guest in the garden",
+      "pattern": [
+        7
+      ]
+    }
+  },
+  {
+    "id": 28,
+    "date": "2026-08-05",
+    "words": [
+      {
+        "answer": "CHECK",
+        "circled": [
+          3,
+          4
+        ],
+        "scramble": "HCCKE"
+      },
+      {
+        "answer": "GUESS",
+        "circled": [
+          1,
+          2
+        ],
+        "scramble": "ESSUG"
+      },
+      {
+        "answer": "WOMAN",
+        "circled": [
+          3
+        ],
+        "scramble": "NMOWA"
+      },
+      {
+        "answer": "PIECE",
+        "circled": [
+          0,
+          3
+        ],
+        "scramble": "IECEP"
+      }
+    ],
+    "bonus": {
+      "answer": "CUPCAKE",
+      "display": "CUP CAKE",
+      "clue": "A little frosted party in a wrapper",
+      "pattern": [
+        3,
+        4
+      ]
+    }
+  },
+  {
+    "id": 29,
+    "date": "2026-08-06",
+    "words": [
+      {
+        "answer": "STYLE",
+        "circled": [
+          0,
+          1,
+          3
+        ],
+        "scramble": "YELTS"
+      },
+      {
+        "answer": "HONOR",
+        "circled": [
+          0,
+          2
+        ],
+        "scramble": "OHORN"
+      },
+      {
+        "answer": "LEVEL",
+        "circled": [
+          3,
+          4
+        ],
+        "scramble": "ELLVE"
+      },
+      {
+        "answer": "WOULD",
+        "circled": [
+          2
+        ],
+        "scramble": "DULOW"
+      }
+    ],
+    "bonus": {
+      "answer": "NUTSHELL",
+      "display": "NUTSHELL",
+      "clue": "Where you put it to keep it brief",
+      "pattern": [
+        8
+      ]
+    }
+  },
+  {
+    "id": 30,
+    "date": "2026-08-07",
+    "words": [
+      {
+        "answer": "FAITH",
+        "circled": [
+          1,
+          4
+        ],
+        "scramble": "IFAHT"
+      },
+      {
+        "answer": "WHICH",
+        "circled": [
+          1,
+          3
+        ],
+        "scramble": "HICHW"
+      },
+      {
+        "answer": "EVENT",
+        "circled": [
+          0,
+          2
+        ],
+        "scramble": "NEVTE"
+      },
+      {
+        "answer": "AVOID",
+        "circled": [
+          0,
+          4
+        ],
+        "scramble": "DIAOV"
+      }
+    ],
+    "bonus": {
+      "answer": "HEADACHE",
+      "display": "HEADACHE",
+      "clue": "What this puzzle is definitely not",
+      "pattern": [
+        8
+      ]
+    }
+  },
+  {
+    "id": 31,
+    "date": "2026-08-08",
+    "words": [
+      {
+        "answer": "UNION",
+        "circled": [
+          0
+        ],
+        "scramble": "NIONU"
+      },
+      {
+        "answer": "CHILD",
+        "circled": [
+          0,
+          2
+        ],
+        "scramble": "DCLHI"
+      },
+      {
+        "answer": "TAKEN",
+        "circled": [
+          0,
+          1,
+          3
+        ],
+        "scramble": "AKENT"
+      },
+      {
+        "answer": "CLASS",
+        "circled": [
+          3,
+          4
+        ],
+        "scramble": "SSCAL"
+      }
+    ],
+    "bonus": {
+      "answer": "SUITCASE",
+      "display": "SUITCASE",
+      "clue": "A vacation's trusty travel buddy",
+      "pattern": [
+        8
+      ]
+    }
+  },
+  {
+    "id": 32,
+    "date": "2026-08-09",
+    "words": [
+      {
+        "answer": "WORLD",
+        "circled": [
+          0
+        ],
+        "scramble": "LDORW"
+      },
+      {
+        "answer": "BLANK",
+        "circled": [
+          2,
+          3,
+          4
+        ],
+        "scramble": "LKBAN"
+      },
+      {
+        "answer": "FLOOR",
+        "circled": [
+          1,
+          2,
+          3
+        ],
+        "scramble": "OORLF"
+      },
+      {
+        "answer": "IMAGE",
+        "circled": [
+          1
+        ],
+        "scramble": "MGEAI"
+      }
+    ],
+    "bonus": {
+      "answer": "MOONWALK",
+      "display": "MOONWALK",
+      "clue": "Michael's famous backward glide",
+      "pattern": [
+        8
+      ]
+    }
+  },
+  {
+    "id": 33,
+    "date": "2026-08-10",
+    "words": [
+      {
+        "answer": "BLACK",
+        "circled": [
+          0,
+          2,
+          4
+        ],
+        "scramble": "ACKBL"
+      },
+      {
+        "answer": "BUILD",
+        "circled": [
+          4
+        ],
+        "scramble": "DIUBL"
+      },
+      {
+        "answer": "CRAZY",
+        "circled": [
+          0,
+          1,
+          4
+        ],
+        "scramble": "YZRCA"
+      },
+      {
+        "answer": "LEAVE",
+        "circled": [
+          2
+        ],
+        "scramble": "EAELV"
+      }
+    ],
+    "bonus": {
+      "answer": "BACKYARD",
+      "display": "BACKYARD",
+      "clue": "Where the grill holds court",
+      "pattern": [
+        8
+      ]
+    }
+  },
+  {
+    "id": 34,
+    "date": "2026-08-11",
+    "words": [
+      {
+        "answer": "SENSE",
+        "circled": [
+          1,
+          2,
+          4
+        ],
+        "scramble": "ENSES"
+      },
+      {
+        "answer": "TRACK",
+        "circled": [
+          2,
+          3,
+          4
+        ],
+        "scramble": "RCKTA"
+      },
+      {
+        "answer": "CIVIL",
+        "circled": [
+          0
+        ],
+        "scramble": "VLICI"
+      },
+      {
+        "answer": "FULLY",
+        "circled": [
+          3
+        ],
+        "scramble": "LLUYF"
+      }
+    ],
+    "bonus": {
+      "answer": "NECKLACE",
+      "display": "NECKLACE",
+      "clue": "Something that hangs around",
+      "pattern": [
+        8
+      ]
+    }
+  },
+  {
+    "id": 35,
+    "date": "2026-08-12",
+    "words": [
+      {
+        "answer": "WATCH",
+        "circled": [
+          1,
+          2
+        ],
+        "scramble": "HTWAC"
+      },
+      {
+        "answer": "QUICK",
+        "circled": [
+          1,
+          4
+        ],
+        "scramble": "KICUQ"
+      },
+      {
+        "answer": "GIVEN",
+        "circled": [
+          3
+        ],
+        "scramble": "NEGVI"
+      },
+      {
+        "answer": "ABOUT",
+        "circled": [
+          2,
+          4
+        ],
+        "scramble": "OAUTB"
+      }
+    ],
+    "bonus": {
+      "answer": "TAKEOUT",
+      "display": "TAKEOUT",
+      "clue": "Dinner that arrives in a box",
       "pattern": [
         7
       ]

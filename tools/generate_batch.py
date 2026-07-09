@@ -18,7 +18,8 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "data" / "puzzles.json"
 BIGDICT = ROOT / "data" / "words_alpha.txt"
 START_DATE = dt.date(2026, 7, 9)
-WANT = 21
+WANT = 35
+NO_REPEAT_WINDOW = 12  # a word won't reappear within this many days
 
 # (bonus display, clue).  Display spaces define the answer's word pattern.
 SEEDS = [
@@ -52,6 +53,24 @@ SEEDS = [
     ("CUP CAKE",   "A little frosted party in a wrapper"),
     ("NUTSHELL",   "Where you put it to keep it brief"),
     ("HEADACHE",   "What this puzzle is definitely not"),
+    ("SUITCASE",   "A vacation's trusty travel buddy"),
+    ("MOONWALK",   "Michael's famous backward glide"),
+    ("BACKYARD",   "Where the grill holds court"),
+    ("NECKLACE",   "Something that hangs around"),
+    ("TAKEOUT",    "Dinner that arrives in a box"),
+    ("SUNDIAL",    "A clock that runs on shadows"),
+    ("HOMESICK",   "Missing your own couch"),
+    ("NIGHT OWL",  "Someone who thrives after midnight"),
+    ("MEATLOAF",   "A dinnertime brick, in a good way"),
+    ("KEY CHAIN",  "It jingles in your pocket"),
+    ("BIRD BATH",  "A robin's backyard spa"),
+    ("OVERDUE",    "Long past its library date"),
+    ("CHECKOUT",   "The last stop before the parking lot"),
+    ("SUNSHINE",   "A cloud's least favorite thing"),
+    ("HANDMADE",   "Crafted, not factory-stamped"),
+    ("WOODWORK",   "What the pests come out of"),
+    ("LOOKOUT",    "A sentry, or a sudden shout"),
+    ("BALL GAME",  "A sunny day with peanuts and cracker jack"),
 ]
 
 
@@ -93,7 +112,7 @@ def main():
 
     puzzles = []
     used = Counter()
-    forbidden = set()            # words already used anywhere in the batch
+    recent_words: list[set] = []  # words used per puzzle, for the rolling window
     date = START_DATE
     num = 1
     log = []
@@ -103,6 +122,7 @@ def main():
             break
         answer = "".join(display.split()).upper()
         pattern = [len(p) for p in display.split()]
+        forbidden: set = set().union(*recent_words[-NO_REPEAT_WINDOW:]) if recent_words else set()
         words_meta, err = build_puzzle(answer, pool, used_counts=used,
                                        forbidden=forbidden, seed=1000 + i)
         if err:
@@ -121,7 +141,7 @@ def main():
             continue
         for w in words_meta:
             used[w["answer"]] += 1
-            forbidden.add(w["answer"])
+        recent_words.append({w["answer"] for w in words_meta})
         puzzles.append(puz)
         log.append(f"OK   #{num} {date}  {display:12s} <- " +
                    ", ".join(w["answer"] for w in words_meta))
