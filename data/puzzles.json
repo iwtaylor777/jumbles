@@ -1,0 +1,959 @@
+[
+  {
+    "id": 1,
+    "date": "2026-07-09",
+    "words": [
+      {
+        "answer": "ORDER",
+        "circled": [
+          2
+        ],
+        "scramble": "RDERO"
+      },
+      {
+        "answer": "BLACK",
+        "circled": [
+          0,
+          2,
+          4
+        ],
+        "scramble": "KBCLA"
+      },
+      {
+        "answer": "WATCH",
+        "circled": [
+          1
+        ],
+        "scramble": "CTHAW"
+      },
+      {
+        "answer": "SUNNY",
+        "circled": [
+          0,
+          2,
+          3
+        ],
+        "scramble": "NNUYS"
+      }
+    ],
+    "bonus": {
+      "answer": "SANDBANK",
+      "display": "SAND BANK",
+      "clue": "Where a beachgoer might keep his money",
+      "pattern": [
+        4,
+        4
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "date": "2026-07-10",
+    "words": [
+      {
+        "answer": "WOULD",
+        "circled": [
+          4
+        ],
+        "scramble": "OLDWU"
+      },
+      {
+        "answer": "FLOOR",
+        "circled": [
+          2,
+          3
+        ],
+        "scramble": "LOFRO"
+      },
+      {
+        "answer": "WHILE",
+        "circled": [
+          1
+        ],
+        "scramble": "ILEHW"
+      },
+      {
+        "answer": "MIGHT",
+        "circled": [
+          2,
+          4
+        ],
+        "scramble": "HGTIM"
+      }
+    ],
+    "bonus": {
+      "answer": "HOTDOG",
+      "display": "HOT DOG",
+      "clue": "An overheated show-off at the cookout",
+      "pattern": [
+        3,
+        3
+      ]
+    }
+  },
+  {
+    "id": 3,
+    "date": "2026-07-11",
+    "words": [
+      {
+        "answer": "POWER",
+        "circled": [
+          0
+        ],
+        "scramble": "REPWO"
+      },
+      {
+        "answer": "WHICH",
+        "circled": [
+          3
+        ],
+        "scramble": "CIHHW"
+      },
+      {
+        "answer": "TAKEN",
+        "circled": [
+          0,
+          1,
+          4
+        ],
+        "scramble": "ETNAK"
+      },
+      {
+        "answer": "ABOUT",
+        "circled": [
+          0
+        ],
+        "scramble": "OUATB"
+      }
+    ],
+    "bonus": {
+      "answer": "CATNAP",
+      "display": "CAT NAP",
+      "clue": "A brief feline board meeting",
+      "pattern": [
+        3,
+        3
+      ]
+    }
+  },
+  {
+    "id": 4,
+    "date": "2026-07-12",
+    "words": [
+      {
+        "answer": "GROUP",
+        "circled": [
+          0
+        ],
+        "scramble": "RPGOU"
+      },
+      {
+        "answer": "FIGHT",
+        "circled": [
+          2,
+          3
+        ],
+        "scramble": "TFIGH"
+      },
+      {
+        "answer": "LEAVE",
+        "circled": [
+          1,
+          2,
+          4
+        ],
+        "scramble": "EVELA"
+      },
+      {
+        "answer": "WORLD",
+        "circled": [
+          4
+        ],
+        "scramble": "OLDRW"
+      }
+    ],
+    "bonus": {
+      "answer": "EGGHEAD",
+      "display": "EGGHEAD",
+      "clue": "A real brainiac, sunny-side up",
+      "pattern": [
+        7
+      ]
+    }
+  },
+  {
+    "id": 5,
+    "date": "2026-07-13",
+    "words": [
+      {
+        "answer": "FORCE",
+        "circled": [
+          2
+        ],
+        "scramble": "CEORF"
+      },
+      {
+        "answer": "HOUSE",
+        "circled": [
+          2,
+          3
+        ],
+        "scramble": "EUSHO"
+      },
+      {
+        "answer": "BRING",
+        "circled": [
+          0
+        ],
+        "scramble": "GNBIR"
+      },
+      {
+        "answer": "UNION",
+        "circled": [
+          0,
+          1,
+          4
+        ],
+        "scramble": "OINNU"
+      }
+    ],
+    "bonus": {
+      "answer": "SUNBURN",
+      "display": "SUNBURN",
+      "clue": "A rosy souvenir from a lazy beach day",
+      "pattern": [
+        7
+      ]
+    }
+  },
+  {
+    "id": 6,
+    "date": "2026-07-14",
+    "words": [
+      {
+        "answer": "GIVEN",
+        "circled": [
+          4
+        ],
+        "scramble": "VENGI"
+      },
+      {
+        "answer": "HAPPY",
+        "circled": [
+          2,
+          3
+        ],
+        "scramble": "PHAYP"
+      },
+      {
+        "answer": "CROSS",
+        "circled": [
+          0,
+          2
+        ],
+        "scramble": "RSSOC"
+      },
+      {
+        "answer": "WORKS",
+        "circled": [
+          1,
+          2
+        ],
+        "scramble": "SKORW"
+      }
+    ],
+    "bonus": {
+      "answer": "POPCORN",
+      "display": "POPCORN",
+      "clue": "A movie's noisiest snack",
+      "pattern": [
+        7
+      ]
+    }
+  },
+  {
+    "id": 7,
+    "date": "2026-07-15",
+    "words": [
+      {
+        "answer": "KNOWN",
+        "circled": [
+          2,
+          4
+        ],
+        "scramble": "NKNOW"
+      },
+      {
+        "answer": "BROWN",
+        "circled": [
+          1,
+          3
+        ],
+        "scramble": "ROWNB"
+      },
+      {
+        "answer": "GOING",
+        "circled": [
+          2
+        ],
+        "scramble": "OGGIN"
+      },
+      {
+        "answer": "ABOVE",
+        "circled": [
+          0,
+          1
+        ],
+        "scramble": "OAVEB"
+      }
+    ],
+    "bonus": {
+      "answer": "RAINBOW",
+      "display": "RAINBOW",
+      "clue": "An arch no one can walk under",
+      "pattern": [
+        7
+      ]
+    }
+  },
+  {
+    "id": 8,
+    "date": "2026-07-16",
+    "words": [
+      {
+        "answer": "PLANT",
+        "circled": [
+          0,
+          2,
+          3
+        ],
+        "scramble": "NAPTL"
+      },
+      {
+        "answer": "MOVIE",
+        "circled": [
+          3
+        ],
+        "scramble": "EMOVI"
+      },
+      {
+        "answer": "MATCH",
+        "circled": [
+          2,
+          3,
+          4
+        ],
+        "scramble": "CMHTA"
+      },
+      {
+        "answer": "LIGHT",
+        "circled": [
+          2
+        ],
+        "scramble": "IGHTL"
+      }
+    ],
+    "bonus": {
+      "answer": "NIGHTCAP",
+      "display": "NIGHTCAP",
+      "clue": "A bedtime drink, or a sleeper's hat",
+      "pattern": [
+        8
+      ]
+    }
+  },
+  {
+    "id": 9,
+    "date": "2026-07-17",
+    "words": [
+      {
+        "answer": "FRONT",
+        "circled": [
+          3
+        ],
+        "scramble": "TORFN"
+      },
+      {
+        "answer": "VIDEO",
+        "circled": [
+          1,
+          2,
+          3
+        ],
+        "scramble": "IDEOV"
+      },
+      {
+        "answer": "ADDED",
+        "circled": [
+          0,
+          1
+        ],
+        "scramble": "DADDE"
+      },
+      {
+        "answer": "TITLE",
+        "circled": [
+          3,
+          4
+        ],
+        "scramble": "ELITT"
+      }
+    ],
+    "bonus": {
+      "answer": "DEADLINE",
+      "display": "DEADLINE",
+      "clue": "The scariest line for any writer",
+      "pattern": [
+        8
+      ]
+    }
+  },
+  {
+    "id": 10,
+    "date": "2026-07-18",
+    "words": [
+      {
+        "answer": "OFTEN",
+        "circled": [
+          3
+        ],
+        "scramble": "ENFTO"
+      },
+      {
+        "answer": "SENSE",
+        "circled": [
+          1,
+          3
+        ],
+        "scramble": "ESENS"
+      },
+      {
+        "answer": "MODEL",
+        "circled": [
+          2,
+          3
+        ],
+        "scramble": "EDOLM"
+      },
+      {
+        "answer": "WOMAN",
+        "circled": [
+          0,
+          3
+        ],
+        "scramble": "AWNMO"
+      }
+    ],
+    "bonus": {
+      "answer": "SEAWEED",
+      "display": "SEAWEED",
+      "clue": "The ocean's leafy greens",
+      "pattern": [
+        7
+      ]
+    }
+  },
+  {
+    "id": 11,
+    "date": "2026-07-19",
+    "words": [
+      {
+        "answer": "CLASS",
+        "circled": [
+          2
+        ],
+        "scramble": "SASCL"
+      },
+      {
+        "answer": "CRAZY",
+        "circled": [
+          2
+        ],
+        "scramble": "YCZRA"
+      },
+      {
+        "answer": "SPENT",
+        "circled": [
+          1,
+          3
+        ],
+        "scramble": "TNSPE"
+      },
+      {
+        "answer": "CHECK",
+        "circled": [
+          2,
+          3,
+          4
+        ],
+        "scramble": "HCKEC"
+      }
+    ],
+    "bonus": {
+      "answer": "PANCAKE",
+      "display": "PANCAKE",
+      "clue": "Breakfast that gets flipped daily",
+      "pattern": [
+        7
+      ]
+    }
+  },
+  {
+    "id": 12,
+    "date": "2026-07-20",
+    "words": [
+      {
+        "answer": "YOUNG",
+        "circled": [
+          2,
+          4
+        ],
+        "scramble": "UNYGO"
+      },
+      {
+        "answer": "COMES",
+        "circled": [
+          1,
+          4
+        ],
+        "scramble": "ECOSM"
+      },
+      {
+        "answer": "LEVEL",
+        "circled": [
+          3
+        ],
+        "scramble": "EVLLE"
+      },
+      {
+        "answer": "HONDA",
+        "circled": [
+          0,
+          1,
+          3
+        ],
+        "scramble": "DNOAH"
+      }
+    ],
+    "bonus": {
+      "answer": "DOGHOUSE",
+      "display": "DOGHOUSE",
+      "clue": "Where a forgetful spouse ends up",
+      "pattern": [
+        8
+      ]
+    }
+  },
+  {
+    "id": 13,
+    "date": "2026-07-21",
+    "words": [
+      {
+        "answer": "SWAMP",
+        "circled": [
+          0,
+          1,
+          2
+        ],
+        "scramble": "MASPW"
+      },
+      {
+        "answer": "PIECE",
+        "circled": [
+          0
+        ],
+        "scramble": "EPCEI"
+      },
+      {
+        "answer": "THIRD",
+        "circled": [
+          3,
+          4
+        ],
+        "scramble": "HTDIR"
+      },
+      {
+        "answer": "SORRY",
+        "circled": [
+          0,
+          1
+        ],
+        "scramble": "RRYOS"
+      }
+    ],
+    "bonus": {
+      "answer": "PASSWORD",
+      "display": "PASSWORD",
+      "clue": "The secret that guards your inbox",
+      "pattern": [
+        8
+      ]
+    }
+  },
+  {
+    "id": 14,
+    "date": "2026-07-22",
+    "words": [
+      {
+        "answer": "ALBUM",
+        "circled": [
+          0,
+          2,
+          4
+        ],
+        "scramble": "LUMAB"
+      },
+      {
+        "answer": "ALLOW",
+        "circled": [
+          0,
+          1,
+          2
+        ],
+        "scramble": "OAWLL"
+      },
+      {
+        "answer": "STOCK",
+        "circled": [
+          1
+        ],
+        "scramble": "TSKOC"
+      },
+      {
+        "answer": "GUESS",
+        "circled": [
+          2
+        ],
+        "scramble": "SSGEU"
+      }
+    ],
+    "bonus": {
+      "answer": "MEATBALL",
+      "display": "MEATBALL",
+      "clue": "A klutz, or a hero's filling",
+      "pattern": [
+        8
+      ]
+    }
+  },
+  {
+    "id": 15,
+    "date": "2026-07-23",
+    "words": [
+      {
+        "answer": "STAFF",
+        "circled": [
+          0,
+          2
+        ],
+        "scramble": "FFSTA"
+      },
+      {
+        "answer": "BUILT",
+        "circled": [
+          0,
+          3
+        ],
+        "scramble": "ITBUL"
+      },
+      {
+        "answer": "SHOWN",
+        "circled": [
+          2,
+          3,
+          4
+        ],
+        "scramble": "WSNHO"
+      },
+      {
+        "answer": "STYLE",
+        "circled": [
+          3
+        ],
+        "scramble": "LYEST"
+      }
+    ],
+    "bonus": {
+      "answer": "SNOWBALL",
+      "display": "SNOWBALL",
+      "clue": "It grows bigger as it rolls downhill",
+      "pattern": [
+        8
+      ]
+    }
+  },
+  {
+    "id": 16,
+    "date": "2026-07-24",
+    "words": [
+      {
+        "answer": "VOICE",
+        "circled": [
+          4
+        ],
+        "scramble": "CEOVI"
+      },
+      {
+        "answer": "ENJOY",
+        "circled": [
+          3
+        ],
+        "scramble": "NYOEJ"
+      },
+      {
+        "answer": "DERBY",
+        "circled": [
+          0,
+          3,
+          4
+        ],
+        "scramble": "RBDYE"
+      },
+      {
+        "answer": "TRACK",
+        "circled": [
+          1,
+          2,
+          4
+        ],
+        "scramble": "KACRT"
+      }
+    ],
+    "bonus": {
+      "answer": "KEYBOARD",
+      "display": "KEYBOARD",
+      "clue": "You pour your feelings out on it",
+      "pattern": [
+        8
+      ]
+    }
+  },
+  {
+    "id": 17,
+    "date": "2026-07-25",
+    "words": [
+      {
+        "answer": "QUICK",
+        "circled": [
+          4
+        ],
+        "scramble": "UKQIC"
+      },
+      {
+        "answer": "SKULL",
+        "circled": [
+          0,
+          1
+        ],
+        "scramble": "LULSK"
+      },
+      {
+        "answer": "CHILD",
+        "circled": [
+          0,
+          2,
+          4
+        ],
+        "scramble": "ILHDC"
+      },
+      {
+        "answer": "RIVER",
+        "circled": [
+          1,
+          3
+        ],
+        "scramble": "IERRV"
+      }
+    ],
+    "bonus": {
+      "answer": "SIDEKICK",
+      "display": "SIDEKICK",
+      "clue": "Robin, to Batman",
+      "pattern": [
+        8
+      ]
+    }
+  },
+  {
+    "id": 18,
+    "date": "2026-07-26",
+    "words": [
+      {
+        "answer": "TRUMP",
+        "circled": [
+          1,
+          3
+        ],
+        "scramble": "MUPRT"
+      },
+      {
+        "answer": "AWAKE",
+        "circled": [
+          1,
+          3
+        ],
+        "scramble": "WKEAA"
+      },
+      {
+        "answer": "BLOCK",
+        "circled": [
+          0,
+          2
+        ],
+        "scramble": "COBKL"
+      },
+      {
+        "answer": "PHOTO",
+        "circled": [
+          2,
+          4
+        ],
+        "scramble": "HOTOP"
+      }
+    ],
+    "bonus": {
+      "answer": "BOOKWORM",
+      "display": "BOOKWORM",
+      "clue": "A voracious reader without any teeth",
+      "pattern": [
+        8
+      ]
+    }
+  },
+  {
+    "id": 19,
+    "date": "2026-07-27",
+    "words": [
+      {
+        "answer": "BELLY",
+        "circled": [
+          0,
+          1,
+          4
+        ],
+        "scramble": "LLYBE"
+      },
+      {
+        "answer": "HEAVY",
+        "circled": [
+          0
+        ],
+        "scramble": "AVEYH"
+      },
+      {
+        "answer": "ROUND",
+        "circled": [
+          1,
+          3
+        ],
+        "scramble": "UNDRO"
+      },
+      {
+        "answer": "PEACE",
+        "circled": [
+          1,
+          4
+        ],
+        "scramble": "EAEPC"
+      }
+    ],
+    "bonus": {
+      "answer": "HONEYBEE",
+      "display": "HONEYBEE",
+      "clue": "A hive's tireless little worker",
+      "pattern": [
+        8
+      ]
+    }
+  },
+  {
+    "id": 20,
+    "date": "2026-07-28",
+    "words": [
+      {
+        "answer": "UPPER",
+        "circled": [
+          0,
+          2,
+          3
+        ],
+        "scramble": "PRUPE"
+      },
+      {
+        "answer": "CATCH",
+        "circled": [
+          0,
+          3
+        ],
+        "scramble": "THCAC"
+      },
+      {
+        "answer": "BROKE",
+        "circled": [
+          3
+        ],
+        "scramble": "OBREK"
+      },
+      {
+        "answer": "IMAGE",
+        "circled": [
+          2
+        ],
+        "scramble": "EGIMA"
+      }
+    ],
+    "bonus": {
+      "answer": "CUPCAKE",
+      "display": "CUPCAKE",
+      "clue": "A muffin that dressed up for a party",
+      "pattern": [
+        7
+      ]
+    }
+  },
+  {
+    "id": 21,
+    "date": "2026-07-29",
+    "words": [
+      {
+        "answer": "EIGHT",
+        "circled": [
+          1,
+          3,
+          4
+        ],
+        "scramble": "ITHGE"
+      },
+      {
+        "answer": "CIVIL",
+        "circled": [
+          0
+        ],
+        "scramble": "ICLVI"
+      },
+      {
+        "answer": "FUNNY",
+        "circled": [
+          1
+        ],
+        "scramble": "YNUFN"
+      },
+      {
+        "answer": "AWARD",
+        "circled": [
+          2,
+          3
+        ],
+        "scramble": "WDRAA"
+      }
+    ],
+    "bonus": {
+      "answer": "HAIRCUT",
+      "display": "HAIRCUT",
+      "clue": "A trim that can cost you a few locks",
+      "pattern": [
+        7
+      ]
+    }
+  }
+]
