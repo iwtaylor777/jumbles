@@ -7,19 +7,24 @@ import {
   saveState,
   loadStats,
   saveStats,
-  recordWin,
+  recordResult,
   loadTheme,
   saveTheme,
+  loadMode,
+  saveMode,
   emptyStats,
+  freshState,
+  MAX_STRIKES,
   type GameState,
   type Stats,
   type Theme,
+  type Mode,
 } from "@/lib/storage";
 import { todaysPuzzle } from "@/lib/puzzles";
 import WordRow from "./WordRow";
 import BonusPanel, { type BonusBankItem } from "./BonusPanel";
-import { HelpModal, StatsModal, WinModal } from "./Modals";
-import { IconButton, InfoIcon, StatsIcon, SunIcon, MoonIcon, BulbIcon, ShareIcon } from "./ui";
+import { HelpModal, StatsModal, WinModal, FailModal } from "./Modals";
+import { IconButton, InfoIcon, StatsIcon, SunIcon, MoonIcon, BulbIcon, ShareIcon, CheckIcon } from "./ui";
 
 type Focus = { kind: "word"; i: number } | { kind: "bonus" };
 
@@ -33,30 +38,37 @@ export default function Game() {
   const [shakeWord, setShakeWord] = useState<number | null>(null);
   const [shakeBonus, setShakeBonus] = useState(false);
   const [justSolved, setJustSolved] = useState<number | null>(null);
+  const [announce, setAnnounce] = useState("");
 
   const [showHelp, setShowHelp] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showWin, setShowWin] = useState(false);
+  const [showFail, setShowFail] = useState(false);
   const recorded = useRef(false);
   const prevSolved = useRef<boolean[]>([]);
   const focusRef = useRef<Focus>({ kind: "word", i: 0 });
   focusRef.current = focus;
+  // live refs so commit guards never read stale animation state
+  const shakeWordRef = useRef<number | null>(null);
+  shakeWordRef.current = shakeWord;
+  const shakeBonusRef = useRef(false);
+  shakeBonusRef.current = shakeBonus;
 
   // ------------------------------------------------------------ mount / load
   useEffect(() => {
     const p = todaysPuzzle();
-    const st = loadState(p);
+    const mode = loadMode();
+    const st = loadState(p, mode);
     setPuzzle(p);
     setGs(st);
     prevSolved.current = [...st.solved];
-    const stat = loadStats();
-    setStats(stat);
-    recorded.current = st.completedAt != null;
+    setStats(loadStats());
+    recorded.current = st.completedAt != null || st.failed;
     setThemeState(loadTheme());
     const firstUnsolved = st.solved.findIndex((s) => !s);
-    const f: Focus = firstUnsolved === -1 ? { kind: "bonus" } : { kind: "word", i: firstUnsolved };
-    setFocus(f);
-    if (stat.played === 0 && st.completedAt == null && st.solved.every((s) => !s)) {
+    setFocus(firstUnsolved === -1 ? { kind: "bonus" } : { kind: "word", i: firstUnsolved });
+    const stat = loadStats();
+    if (stat.played === 0 && st.completedAt == null && !st.failed && st.solved.every((s) => !s)) {
       setShowHelp(true);
     }
   }, []);
@@ -70,6 +82,15 @@ export default function Game() {
     saveTheme(t);
     const dark = t === "dark" || (t === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
     document.documentElement.classList.toggle("dark", dark);
+  };
+
+  const setMode = (m: Mode) => {
+    saveMode(m);
+    // switching keeps board progress but resets stakes for the current puzzle
+    setGs((c) => (c ? { ...c, mode: m, strikes: 0, failed: false } : c));
+    recorded.current = false;
+    setShowFail(false);
+    setAnnounce(m === "relaxed" ? "Relaxed mode. No strikes." : "Challenge mode. Four strikes.");
   };
 
   // -------------------------------------------------------------- derived
@@ -90,15 +111,14 @@ export default function Game() {
   );
 
   // ----------------------------------------------- pure state transitions
-  // All mutations are pure (prev -> next) so functional setState composes
-  // correctly even under very fast keyboard input (no stale-closure races).
   const applyPlaceBank = (prev: GameState, w: number, bankIdx: number): GameState => {
-    if (!puzzle || prev.solved[w]) return prev;
+    if (!puzzle || prev.solved[w] || prev.failed) return prev;
     const row = [...prev.placement[w]];
     if (row.includes(bankIdx) || !row.includes(null)) return prev;
     row[row.indexOf(null)] = bankIdx;
     const placement = prev.placement.map((r, i) => (i === w ? row : r));
-    if (!row.includes(null)) {
+    // auto-check ONLY in relaxed mode (challenge requires an explicit commit)
+    if (prev.mode === "relaxed" && !row.includes(null)) {
       const attempt = row.map((bi) => puzzle.words[w].scramble[bi as number]).join("");
       if (attempt === puzzle.words[w].answer) {
         const solved = [...prev.solved];
@@ -110,16 +130,15 @@ export default function Game() {
   };
 
   const applyPlaceChar = (prev: GameState, w: number, ch: string): GameState => {
-    if (!puzzle || prev.solved[w]) return prev;
+    if (!puzzle || prev.solved[w] || prev.failed) return prev;
     const row = prev.placement[w];
-    for (let k = 0; k < 5; k++) {
+    for (let k = 0; k < 5; k++)
       if (puzzle.words[w].scramble[k] === ch && !row.includes(k)) return applyPlaceBank(prev, w, k);
-    }
     return prev;
   };
 
   const applyType = (prev: GameState, ch: string, f: Focus): GameState => {
-    if (!puzzle) return prev;
+    if (!puzzle || prev.failed) return prev;
     if (prev.solved.every(Boolean) || f.kind === "bonus") return applyBonusChar(prev, ch);
     const w = f.kind === "word" && !prev.solved[f.i] ? f.i : prev.solved.findIndex((s) => !s);
     if (w === -1) return applyBonusChar(prev, ch);
@@ -127,14 +146,14 @@ export default function Game() {
   };
 
   const applyRemoveSlot = (prev: GameState, w: number, slot: number): GameState => {
-    if (prev.solved[w]) return prev;
+    if (prev.solved[w] || prev.failed) return prev;
     const row = [...prev.placement[w]];
     row[slot] = null;
     return { ...prev, placement: prev.placement.map((r, i) => (i === w ? row : r)) };
   };
 
   const applyBackspaceWord = (prev: GameState, w: number): GameState => {
-    if (prev.solved[w]) return prev;
+    if (prev.solved[w] || prev.failed) return prev;
     const row = [...prev.placement[w]];
     for (let s = 4; s >= 0; s--)
       if (row[s] !== null) {
@@ -145,13 +164,17 @@ export default function Game() {
   };
 
   const applyBonusPlace = (prev: GameState, letter: string, bankIdx: number | null): GameState => {
-    if (!puzzle || prev.bonusSolved || !prev.bonusLetters.includes(null)) return prev;
+    if (!puzzle || prev.bonusSolved || prev.failed || !prev.bonusLetters.includes(null)) return prev;
     const slot = prev.bonusLetters.indexOf(null);
     const bonusLetters = [...prev.bonusLetters];
     const bonusSrc = [...prev.bonusSrc];
     bonusLetters[slot] = letter;
     bonusSrc[slot] = bankIdx;
-    if (!bonusLetters.includes(null) && bonusLetters.join("") === puzzle.bonus.answer) {
+    if (
+      prev.mode === "relaxed" &&
+      !bonusLetters.includes(null) &&
+      bonusLetters.join("") === puzzle.bonus.answer
+    ) {
       return {
         ...prev,
         bonusLetters,
@@ -164,7 +187,7 @@ export default function Game() {
   };
 
   function applyBonusChar(prev: GameState, ch: string): GameState {
-    if (prev.bonusSolved || !prev.bonusLetters.includes(null)) return prev;
+    if (prev.bonusSolved || prev.failed || !prev.bonusLetters.includes(null)) return prev;
     let bankIdx: number | null = null;
     for (let i = 0; i < bonusBank.length; i++)
       if (bonusBank[i].available && bonusBank[i].letter === ch && !prev.bonusSrc.includes(i)) {
@@ -175,7 +198,7 @@ export default function Game() {
   }
 
   const applyRemoveBonus = (prev: GameState, slot: number): GameState => {
-    if (prev.bonusSolved) return prev;
+    if (prev.bonusSolved || prev.failed) return prev;
     const bonusLetters = [...prev.bonusLetters];
     const bonusSrc = [...prev.bonusSrc];
     bonusLetters[slot] = null;
@@ -184,7 +207,7 @@ export default function Game() {
   };
 
   const applyBackspaceBonus = (prev: GameState): GameState => {
-    if (prev.bonusSolved) return prev;
+    if (prev.bonusSolved || prev.failed) return prev;
     for (let s = prev.bonusLetters.length - 1; s >= 0; s--)
       if (prev.bonusLetters[s] !== null) return applyRemoveBonus(prev, s);
     return prev;
@@ -194,7 +217,6 @@ export default function Game() {
     setGs((cur) => (cur ? fn(cur) : cur));
   }, []);
 
-  // ---- tap handlers -------------------------------------------------------
   const placeBank = (w: number, bankIdx: number) => update((p) => applyPlaceBank(p, w, bankIdx));
   const removeSlot = (w: number, slot: number) => update((p) => applyRemoveSlot(p, w, slot));
   const placeBonusBank = (bankIdx: number) =>
@@ -205,9 +227,76 @@ export default function Game() {
     });
   const removeBonus = (slot: number) => update((p) => applyRemoveBonus(p, slot));
 
+  // ------------------------------------------------ commit (challenge mode)
+  const strike = () =>
+    update((p) => {
+      const strikes = p.strikes + 1;
+      return { ...p, strikes, failed: strikes >= MAX_STRIKES };
+    });
+
+  const commitWord = (w: number) => {
+    if (!puzzle || !gs || gs.mode !== "challenge" || gs.solved[w] || gs.failed || shakeWordRef.current === w)
+      return;
+    const row = gs.placement[w];
+    if (row.includes(null)) {
+      setAnnounce("Fill all five letters first.");
+      return;
+    }
+    const attempt = row.map((bi) => puzzle.words[w].scramble[bi as number]).join("");
+    if (attempt === puzzle.words[w].answer) {
+      update((p) => {
+        const solved = [...p.solved];
+        solved[w] = true;
+        return { ...p, solved };
+      });
+    } else {
+      const next = gs.strikes + 1;
+      strike();
+      setShakeWord(w);
+      setTimeout(() => setShakeWord((s) => (s === w ? null : s)), 460);
+      setAnnounce(
+        next >= MAX_STRIKES
+          ? "Out of strikes. You've been jumbled."
+          : `Not the word. Strike ${next} of ${MAX_STRIKES}.`,
+      );
+    }
+  };
+
+  const commitBonus = () => {
+    if (!puzzle || !gs || gs.mode !== "challenge" || gs.bonusSolved || gs.failed || shakeBonusRef.current) return;
+    if (gs.bonusLetters.includes(null)) {
+      setAnnounce("Fill in the whole bonus first.");
+      return;
+    }
+    if (gs.bonusLetters.join("") === puzzle.bonus.answer) {
+      update((p) => ({
+        ...p,
+        bonusSolved: true,
+        solvedCountWhenBonus: p.solved.filter(Boolean).length,
+      }));
+    } else {
+      const next = gs.strikes + 1;
+      strike();
+      setShakeBonus(true);
+      setTimeout(() => setShakeBonus(false), 460);
+      setAnnounce(
+        next >= MAX_STRIKES
+          ? "Out of strikes. You've been jumbled."
+          : `Not the bonus. Strike ${next} of ${MAX_STRIKES}.`,
+      );
+    }
+  };
+
+  const commitFocus = () => {
+    const f = focusRef.current;
+    if (!gs) return;
+    if (gs.solved.every(Boolean) || f.kind === "bonus") commitBonus();
+    else if (f.kind === "word") commitWord(f.i);
+  };
+
   // ------------------------------------------------------------------ hint
   const hint = () => {
-    if (!puzzle || !gs) return;
+    if (!puzzle || !gs || gs.failed) return;
     const allSolved = gs.solved.every(Boolean);
     if (!allSolved) {
       const w = focus.kind === "word" && !gs.solved[focus.i] ? focus.i : gs.solved.findIndex((s) => !s);
@@ -235,14 +324,20 @@ export default function Game() {
         const placement = p.placement.map((r, i) => (i === w ? row : r));
         const hintedWords = [...p.hintedWords];
         hintedWords[w] = true;
+        // a hint that completes the word in relaxed auto-solves; challenge still needs commit
         let solved = p.solved;
-        if (!row.includes(null) && row.map((b) => word.scramble[b as number]).join("") === word.answer) {
+        if (
+          p.mode === "relaxed" &&
+          !row.includes(null) &&
+          row.map((b) => word.scramble[b as number]).join("") === word.answer
+        ) {
           solved = [...p.solved];
           solved[w] = true;
         }
         return { ...p, placement, hintedWords, hintsUsed: p.hintsUsed + 1, solved };
       });
       setFocus({ kind: "word", i: w });
+      setAnnounce("Hint used: a letter was revealed.");
       return;
     }
     if (gs.bonusSolved) return;
@@ -261,7 +356,7 @@ export default function Game() {
         bonusLetters[s] = ans[s];
         bonusSrc[s] = bankIdx;
         const solvedNow =
-          !bonusLetters.includes(null) && bonusLetters.join("") === ans;
+          p.mode === "relaxed" && !bonusLetters.includes(null) && bonusLetters.join("") === ans;
         return {
           ...p,
           bonusLetters,
@@ -274,16 +369,17 @@ export default function Game() {
       }
       return p;
     });
+    setAnnounce("Hint used: a bonus letter was revealed.");
   };
 
-  // ---- declarative side effects (no stale closures) -----------------------
-  // newly solved word -> pop animation + advance focus
+  // ---- declarative side effects ------------------------------------------
   useEffect(() => {
-    if (!gs) return;
+    if (!gs || !puzzle) return;
     gs.solved.forEach((s, w) => {
       if (s && !prevSolved.current[w]) {
         setJustSolved(w);
         setTimeout(() => setJustSolved((j) => (j === w ? null : j)), 700);
+        setAnnounce(`${puzzle.words[w].answer} — solved.`);
         for (let d = 1; d <= gs.solved.length; d++) {
           const i = (w + d) % gs.solved.length;
           if (!gs.solved[i]) {
@@ -297,9 +393,9 @@ export default function Game() {
     prevSolved.current = [...gs.solved];
   }, [gs?.solved]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // full-but-wrong word -> shake, then clear
+  // relaxed-only: a full-but-wrong word shakes then clears
   useEffect(() => {
-    if (!gs) return;
+    if (!gs || gs.mode !== "relaxed") return;
     gs.placement.forEach((row, w) => {
       if (!gs.solved[w] && !row.includes(null) && shakeWord !== w) {
         setShakeWord(w);
@@ -311,9 +407,9 @@ export default function Game() {
     });
   }, [gs, shakeWord, update]);
 
-  // full-but-wrong bonus -> shake, then clear
+  // relaxed-only: a full-but-wrong bonus shakes then clears
   useEffect(() => {
-    if (!gs || gs.bonusSolved) return;
+    if (!gs || gs.mode !== "relaxed" || gs.bonusSolved) return;
     if (!gs.bonusLetters.includes(null) && !shakeBonus) {
       setShakeBonus(true);
       setTimeout(() => {
@@ -323,31 +419,54 @@ export default function Game() {
     }
   }, [gs, shakeBonus, update]);
 
-  // bonus solved -> reveal board, record stats, confetti, win modal
+  // win
   useEffect(() => {
     if (!puzzle || !gs || !gs.bonusSolved) return;
-    if (!gs.solved.every(Boolean)) {
-      update((p) => ({ ...p, solved: p.solved.map(() => true) }));
-      return;
-    }
     if (gs.completedAt == null) update((p) => ({ ...p, completedAt: Date.now() }));
     if (!recorded.current) {
       recorded.current = true;
       const early = (gs.solvedCountWhenBonus ?? 0) < puzzle.words.length;
-      const ns = recordWin(stats, puzzle.date, gs.hintsUsed, early);
+      const ns = recordResult(stats, puzzle.date, {
+        won: true,
+        mode: gs.mode,
+        hintsUsed: gs.hintsUsed,
+        strikes: gs.strikes,
+        early,
+      });
       setStats(ns);
       saveStats(ns);
+      setAnnounce("Solved! Bonus complete.");
       import("canvas-confetti")
         .then((m) => m.default({ particleCount: 130, spread: 72, origin: { y: 0.6 }, disableForReducedMotion: true }))
         .catch(() => {});
       setTimeout(() => setShowWin(true), 560);
     }
-  }, [gs?.bonusSolved, gs?.solved]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [gs?.bonusSolved]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // loss
+  useEffect(() => {
+    if (!puzzle || !gs || !gs.failed) return;
+    if (gs.completedAt == null) update((p) => ({ ...p, completedAt: Date.now() }));
+    if (!recorded.current) {
+      recorded.current = true;
+      const ns = recordResult(stats, puzzle.date, {
+        won: false,
+        mode: gs.mode,
+        hintsUsed: gs.hintsUsed,
+        strikes: gs.strikes,
+        early: false,
+      });
+      setStats(ns);
+      saveStats(ns);
+      setAnnounce("You've been jumbled. The answers are revealed.");
+      setTimeout(() => setShowFail(true), 620);
+    }
+  }, [gs?.failed]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // --------------------------------------------------------- keyboard input
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (showHelp || showStats || showWin) return;
+      if (showHelp || showStats || showWin || showFail) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (/^[a-zA-Z]$/.test(e.key)) {
         update((p) => applyType(p, e.key.toUpperCase(), focusRef.current));
@@ -359,11 +478,14 @@ export default function Game() {
           return applyBackspaceWord(p, f.i);
         });
         e.preventDefault();
+      } else if (e.key === "Enter") {
+        commitFocus();
+        e.preventDefault();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [showHelp, showStats, showWin, bonusBank]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [showHelp, showStats, showWin, showFail, bonusBank, gs]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ------------------------------------------------------------------ render
   if (!puzzle || !gs) {
@@ -383,10 +505,22 @@ export default function Game() {
     day: "numeric",
   });
   const dark = document.documentElement.classList.contains("dark");
-  const completed = gs.completedAt != null;
+  const done = gs.completedAt != null || gs.failed;
+  const challenge = gs.mode === "challenge";
+
+  // primary action availability
+  const focusFull =
+    focus.kind === "bonus" || gs.solved.every(Boolean)
+      ? !gs.bonusLetters.includes(null)
+      : focus.kind === "word" && !gs.solved[focus.i] && !gs.placement[focus.i].includes(null);
+  const canCheck = challenge && !done && focusFull;
 
   return (
     <div className="wrap">
+      <p className="sr-only" role="status" aria-live="polite">
+        {announce}
+      </p>
+
       <header className="flex items-center justify-between pt-4 pb-3">
         <div className="w-24 flex">
           <IconButton label="How to play" onClick={() => setShowHelp(true)}>
@@ -407,9 +541,24 @@ export default function Game() {
       </header>
 
       <div className="rule" />
-      <p className="text-center text-[0.8rem] tracking-wide mt-2.5 mb-4" style={{ color: "var(--muted)" }}>
-        {dateLabel} · No. {puzzle.id}
-      </p>
+
+      {/* status row: date/number + mode + strikes */}
+      <div className="flex items-center justify-between mt-2.5 mb-4 text-[0.8rem]" style={{ color: "var(--muted)" }}>
+        <span>
+          {dateLabel} · No. {puzzle.id}
+        </span>
+        <div className="flex items-center gap-2">
+          {challenge && !done && <Strikes used={gs.strikes} />}
+          <button
+            className="modepill"
+            onClick={() => setMode(challenge ? "relaxed" : "challenge")}
+            aria-label={`Mode: ${challenge ? "Challenge" : "Relaxed"}. Tap to switch.`}
+            title="Switch mode"
+          >
+            {challenge ? "Challenge" : "Relaxed"}
+          </button>
+        </div>
+      </div>
 
       <div className="space-y-3">
         {puzzle.words.map((w, i) => (
@@ -419,6 +568,7 @@ export default function Game() {
             word={w}
             placement={gs.placement[i]}
             solved={gs.solved[i]}
+            revealed={gs.failed}
             focused={focus.kind === "word" && focus.i === i && !gs.solved[i]}
             shaking={shakeWord === i}
             justSolved={justSolved === i}
@@ -436,6 +586,7 @@ export default function Game() {
           bankUsed={bonusBankUsed}
           letters={gs.bonusLetters}
           solved={gs.bonusSolved}
+          revealed={gs.failed}
           focused={focus.kind === "bonus"}
           shaking={shakeBonus}
           onFocus={() => setFocus({ kind: "bonus" })}
@@ -444,21 +595,50 @@ export default function Game() {
         />
       </div>
 
+      {/* controls */}
       <div className="flex items-center justify-center gap-3 mt-5">
-        {completed ? (
-          <button className="btn btn-primary flex items-center gap-2" onClick={() => setShowWin(true)}>
+        {done ? (
+          <button
+            className="btn btn-primary flex items-center gap-2"
+            onClick={() => (gs.failed ? setShowFail(true) : setShowWin(true))}
+          >
             <ShareIcon /> View result
           </button>
         ) : (
-          <button className="btn btn-ghost flex items-center gap-2" onClick={hint} aria-label="Reveal a letter">
-            <BulbIcon /> Hint
-          </button>
+          <>
+            <button className="btn btn-ghost flex items-center gap-2" onClick={hint} aria-label="Reveal a letter (costs your grade in Challenge)">
+              <BulbIcon /> Hint
+            </button>
+            {challenge && (
+              <button
+                className="btn btn-primary flex items-center gap-2"
+                onClick={commitFocus}
+                disabled={!canCheck}
+                aria-label="Check the current word or bonus"
+              >
+                <CheckIcon /> Check
+              </button>
+            )}
+          </>
         )}
       </div>
 
-      {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
+      {showHelp && <HelpModal mode={gs.mode} onClose={() => setShowHelp(false)} />}
       {showStats && <StatsModal stats={stats} onClose={() => setShowStats(false)} />}
       {showWin && <WinModal puzzle={puzzle} state={gs} stats={stats} onClose={() => setShowWin(false)} />}
+      {showFail && <FailModal puzzle={puzzle} state={gs} stats={stats} onClose={() => setShowFail(false)} />}
     </div>
+  );
+}
+
+function Strikes({ used }: { used: number }) {
+  return (
+    <span className="flex items-center gap-1" aria-label={`Strikes: ${used} of ${MAX_STRIKES}`}>
+      {Array.from({ length: MAX_STRIKES }).map((_, i) => (
+        <span key={i} className={`strike${i < used ? " spent" : ""}`} aria-hidden>
+          {i < used ? "✕" : ""}
+        </span>
+      ))}
+    </span>
   );
 }

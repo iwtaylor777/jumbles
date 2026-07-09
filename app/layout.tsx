@@ -20,7 +20,7 @@ const description =
   "Unscramble four words, then use the circled letters to crack the bonus. A new Jumbles puzzle every day.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://jumbles.vercel.app"),
+  metadataBase: new URL("https://playjumbles.com"),
   title,
   description,
   applicationName: "Jumbles",

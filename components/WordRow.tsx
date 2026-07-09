@@ -6,6 +6,7 @@ type Props = {
   word: WordSpec;
   placement: (number | null)[];
   solved: boolean;
+  revealed: boolean; // failed run — show the answer, greyed
   focused: boolean;
   shaking: boolean;
   justSolved: boolean;
@@ -19,27 +20,32 @@ export default function WordRow({
   word,
   placement,
   solved,
+  revealed,
   focused,
   shaking,
   justSolved,
-  index,
   onFocus,
   onPlaceBank,
   onRemoveSlot,
 }: Props) {
   const circled = new Set(word.circled);
 
-  if (solved) {
+  // solved (or revealed-on-fail) collapses to a compact row
+  if (solved || revealed) {
     return (
-      <div className="solvedrow py-1.5" aria-label={`Solved: ${word.answer}`}>
-        <span className="text-accent shrink-0" aria-hidden>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+      <div className="solvedrow py-1.5" aria-label={`${solved ? "Solved" : "Answer"}: ${word.answer}`}>
+        <span className={solved ? "text-accent shrink-0" : "shrink-0"} style={solved ? undefined : { color: "var(--muted)" }} aria-hidden>
+          {solved ? (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+          )}
         </span>
         <div className="flex gap-1.5">
           {word.answer.split("").map((ch, i) => (
             <span
               key={i}
-              className={`tile slot solved${circled.has(i) ? " circled" : ""}${justSolved && circled.has(i) ? " pop" : ""}`}
+              className={`tile slot ${solved ? "solved" : "revealed"}${circled.has(i) ? " circled" : ""}${justSolved && solved && circled.has(i) ? " pop" : ""}`}
               style={{
                 width: "calc(var(--tile-size) * 0.82)",
                 height: "calc(var(--tile-size) * 0.82)",
@@ -57,26 +63,21 @@ export default function WordRow({
   const bankUsed = new Set(placement.filter((x): x is number => x !== null));
 
   return (
-    <div
-      className={`wordcard${focused ? " focused" : ""} ${shaking ? "shake" : ""}`}
-      onClick={onFocus}
-    >
-      {/* answer slots */}
+    <div className={`wordcard${focused ? " focused" : ""} ${shaking ? "shake" : ""}`} onClick={onFocus}>
+      {/* answer slots — circled positions are hidden until the word is solved */}
       <div className="flex gap-1.5 justify-center">
         {placement.map((bankIdx, slot) => {
           const letter = bankIdx === null ? "" : word.scramble[bankIdx];
           return (
             <button
               key={slot}
-              className={`tile slot${letter ? " filled" : ""}${circled.has(slot) ? " circled" : ""}`}
+              className={`tile slot${letter ? " filled" : ""}`}
               onClick={(e) => {
                 e.stopPropagation();
                 if (letter) onRemoveSlot(slot);
                 else onFocus();
               }}
-              aria-label={
-                letter ? `Slot ${slot + 1}, ${letter}. Tap to remove` : `Empty slot ${slot + 1}`
-              }
+              aria-label={letter ? `Slot ${slot + 1}, ${letter}. Tap to remove` : `Empty slot ${slot + 1}`}
             >
               {letter}
             </button>

@@ -10,6 +10,7 @@ type Props = {
   bankUsed: Set<number>;
   letters: (string | null)[];
   solved: boolean;
+  revealed: boolean; // failed run — show the answer, greyed
   focused: boolean;
   shaking: boolean;
   onFocus: () => void;
@@ -23,6 +24,7 @@ export default function BonusPanel({
   bankUsed,
   letters,
   solved,
+  revealed,
   focused,
   shaking,
   onFocus,
@@ -59,11 +61,11 @@ export default function BonusPanel({
         &ldquo;{bonus.clue}&rdquo;
       </p>
 
-      {solved ? (
+      {solved || revealed ? (
         <p
-          className="masthead pop text-center"
+          className={`masthead text-center${solved ? " pop" : ""}`}
           style={{
-            color: "var(--gold)",
+            color: solved ? "var(--gold)" : "var(--muted)",
             fontSize: "clamp(1.6rem, 8vw, 2.2rem)",
             fontWeight: 600,
           }}

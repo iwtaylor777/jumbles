@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import type { Puzzle } from "@/lib/types";
-import type { GameState, Stats } from "@/lib/storage";
+import type { GameState, Stats, Mode } from "@/lib/storage";
 import { buildShare } from "@/lib/share";
+import { rankFor, isEarlyFlair } from "@/lib/score";
 import { msUntilTomorrow } from "@/lib/puzzles";
 import { CloseIcon, ShareIcon } from "./ui";
 
@@ -34,20 +35,20 @@ function Header({ title, onClose }: { title: string; onClose: () => void }) {
 }
 
 // ---------------------------------------------------------------- How to play
-export function HelpModal({ onClose }: { onClose: () => void }) {
+export function HelpModal({ mode, onClose }: { mode: Mode; onClose: () => void }) {
   return (
     <Overlay onClose={onClose}>
       <Header title="How to play" onClose={onClose} />
       <div className="px-5 pb-6 space-y-4 text-[0.95rem]" style={{ color: "var(--text)" }}>
         <p style={{ color: "var(--muted)" }}>
-          Unscramble all four words, then use the <b style={{ color: "var(--gold)" }}>circled</b>{" "}
-          letters to crack the bonus.
+          Unscramble all four words, then use the <b style={{ color: "var(--gold)" }}>circled</b> letters
+          — revealed as you solve — to crack the bonus.
         </p>
         <ol className="space-y-3">
           {[
-            ["Build each word", "Tap the jumbled letters to drop them into the slots. Tap a slot to send a letter back."],
-            ["Watch the circles", "Each answer has circled positions. Those letters collect below in the bonus."],
-            ["Solve the bonus", "Unscramble the circled letters — guided by the clue — to finish the day."],
+            ["Build each word", "Tap the jumbled letters into the slots (or type). Tap a slot to send a letter back."],
+            ["Reveal the circles", "Solve a word and its circled letters light up and drop into the bonus below."],
+            ["Crack the bonus", "Unscramble the circled letters — guided by the clue — to finish the day."],
           ].map(([h, b], i) => (
             <li key={i} className="flex gap-3">
               <span
@@ -62,10 +63,18 @@ export function HelpModal({ onClose }: { onClose: () => void }) {
             </li>
           ))}
         </ol>
-        <p className="text-sm" style={{ color: "var(--muted)" }}>
-          A new puzzle arrives every day. Know the answer from the clue? Type it straight in for
-          bonus bragging rights.
-        </p>
+        <div className="rule" />
+        <div className="text-sm space-y-2" style={{ color: "var(--muted)" }}>
+          <p>
+            <b style={{ color: "var(--text)" }}>Challenge</b> — tap <b>Check</b> (or press Enter) to submit
+            a word. Four wrong guesses and you&rsquo;re jumbled. Hints cost your rank.
+          </p>
+          <p>
+            <b style={{ color: "var(--text)" }}>Relaxed</b> — no strikes, free hints, words check themselves.
+            Switch anytime with the mode pill up top.
+          </p>
+          <p>You&rsquo;re currently in <b style={{ color: "var(--text)" }}>{mode === "challenge" ? "Challenge" : "Relaxed"}</b> mode.</p>
+        </div>
         <button className="btn btn-primary w-full" onClick={onClose}>
           Got it
         </button>
@@ -99,9 +108,10 @@ export function StatsModal({ stats, onClose }: { stats: Stats; onClose: () => vo
           <Stat n={stats.maxStreak} label="Max streak" />
         </div>
         <div className="rule my-5" />
-        <div className="grid grid-cols-2 gap-2">
-          <Stat n={stats.cleanSolves} label="No-hint solves" />
+        <div className="grid grid-cols-3 gap-2">
+          <Stat n={stats.flawless} label="Jumble Masters" />
           <Stat n={stats.earlyBonus} label="Early bonuses" />
+          <Stat n={stats.losses} label="Jumbled" />
         </div>
       </div>
     </Overlay>
@@ -122,6 +132,46 @@ function useCountdown() {
   return `${pad(h)}:${pad(m)}:${pad(s)}`;
 }
 
+function ShareButton({ puzzle, state }: { puzzle: Puzzle; state: GameState }) {
+  const [copied, setCopied] = useState(false);
+  async function share() {
+    const text = buildShare(puzzle, state);
+    try {
+      if (navigator.share) {
+        await navigator.share({ text });
+        return;
+      }
+    } catch {
+      /* cancelled */
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      /* ignore */
+    }
+  }
+  return (
+    <button className="btn btn-primary w-full flex items-center justify-center gap-2" onClick={share}>
+      <ShareIcon />
+      {copied ? "Copied!" : "Share"}
+    </button>
+  );
+}
+
+function Countdown() {
+  const countdown = useCountdown();
+  return (
+    <div className="mt-5">
+      <div className="text-[0.7rem] uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+        Next puzzle
+      </div>
+      <div className="text-xl font-bold tabular-nums mt-0.5">{countdown}</div>
+    </div>
+  );
+}
+
 // --------------------------------------------------------------------- Win
 export function WinModal({
   puzzle,
@@ -134,32 +184,8 @@ export function WinModal({
   stats: Stats;
   onClose: () => void;
 }) {
-  const countdown = useCountdown();
-  const [copied, setCopied] = useState(false);
-  const early =
-    state.solvedCountWhenBonus !== null && state.solvedCountWhenBonus < puzzle.words.length;
-  const clean = state.hintsUsed === 0;
-
-  async function share() {
-    const text = buildShare(puzzle, state);
-    try {
-      if (navigator.share) {
-        await navigator.share({ text });
-        return;
-      }
-    } catch {
-      /* user cancelled — fall through to copy */
-    }
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    } catch {
-      /* ignore */
-    }
-  }
-
-  const headline = early ? "Cracked it early!" : clean ? "Flawless!" : "Solved!";
+  const rank = rankFor(state);
+  const early = isEarlyFlair(state, puzzle.words.length);
 
   return (
     <Overlay onClose={onClose}>
@@ -173,15 +199,25 @@ export function WinModal({
         >
           {puzzle.bonus.display}
         </p>
-        <h2 className="masthead text-2xl mt-3">{headline}</h2>
-        <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
-          Jumbles No. {puzzle.id}
-          {early && state.bonusSolved
-            ? ` · bonus with ${state.solvedCountWhenBonus}/${puzzle.words.length} words`
-            : clean
-              ? " · no hints"
-              : ""}
-        </p>
+
+        {rank ? (
+          <>
+            <h2 className="masthead text-2xl mt-3">
+              {rank.emoji} {rank.label}
+            </h2>
+            <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
+              {rank.blurb}
+              {early ? ` · early bonus` : ""}
+            </p>
+          </>
+        ) : (
+          <>
+            <h2 className="masthead text-2xl mt-3">Nicely done{early ? " — early!" : ""}</h2>
+            <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
+              Jumbles No. {puzzle.id} · Relaxed
+            </p>
+          </>
+        )}
 
         <div className="grid grid-cols-3 gap-2 my-5">
           <Stat n={stats.played} label="Played" />
@@ -189,17 +225,52 @@ export function WinModal({
           <Stat n={stats.maxStreak} label="Max streak" />
         </div>
 
-        <button className="btn btn-primary w-full flex items-center justify-center gap-2" onClick={share}>
-          <ShareIcon />
-          {copied ? "Copied!" : "Share"}
-        </button>
+        <ShareButton puzzle={puzzle} state={state} />
+        <Countdown />
+      </div>
+    </Overlay>
+  );
+}
 
-        <div className="mt-5">
-          <div className="text-[0.7rem] uppercase tracking-wide" style={{ color: "var(--muted)" }}>
-            Next puzzle
-          </div>
-          <div className="text-xl font-bold tabular-nums mt-0.5">{countdown}</div>
+// --------------------------------------------------------------------- Fail
+export function FailModal({
+  puzzle,
+  state,
+  stats,
+  onClose,
+}: {
+  puzzle: Puzzle;
+  state: GameState;
+  stats: Stats;
+  onClose: () => void;
+}) {
+  return (
+    <Overlay onClose={onClose}>
+      <div className="px-6 pt-7 pb-6 text-center">
+        <div className="scatter text-4xl" aria-hidden>
+          🤪
         </div>
+        <h2 className="masthead mt-2" style={{ fontSize: "clamp(1.5rem,7.5vw,2rem)" }}>
+          You&rsquo;ve been jumbled, fool!
+        </h2>
+        <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
+          Out of strikes on Jumbles No. {puzzle.id}. The answer was:
+        </p>
+        <p className="masthead mt-1" style={{ color: "var(--gold)", fontSize: "clamp(1.4rem,7vw,1.9rem)", fontWeight: 600 }}>
+          {puzzle.bonus.display}
+        </p>
+
+        <div className="grid grid-cols-3 gap-2 my-5">
+          <Stat n={stats.played} label="Played" />
+          <Stat n={stats.currentStreak} label="Streak" />
+          <Stat n={stats.losses} label="Jumbled" />
+        </div>
+
+        <ShareButton puzzle={puzzle} state={state} />
+        <p className="text-xs mt-3" style={{ color: "var(--muted)" }}>
+          Prefer no strikes? Switch to Relaxed with the mode pill.
+        </p>
+        <Countdown />
       </div>
     </Overlay>
   );
