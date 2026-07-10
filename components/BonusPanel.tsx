@@ -11,11 +11,13 @@ type Props = {
   letters: (string | null)[];
   solved: boolean;
   revealed: boolean; // failed run — show the answer, greyed
+  challenge: boolean;
   focused: boolean;
   shaking: boolean;
   onFocus: () => void;
   onPlaceBank: (bankIdx: number) => void;
   onRemoveSlot: (slot: number) => void;
+  onCommit: () => void;
 };
 
 export default function BonusPanel({
@@ -25,12 +27,15 @@ export default function BonusPanel({
   letters,
   solved,
   revealed,
+  challenge,
   focused,
   shaking,
   onFocus,
   onPlaceBank,
   onRemoveSlot,
+  onCommit,
 }: Props) {
+  const full = letters.every((x) => x !== null);
   // group flat slot indices by the word-length pattern
   const groups: number[][] = [];
   let idx = 0;
@@ -141,6 +146,21 @@ export default function BonusPanel({
               ),
             )}
           </div>
+
+          {challenge && full && (
+            <div className="flex justify-center mt-4">
+              <button
+                className="btn btn-primary submit-inline pulse"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCommit();
+                }}
+                aria-label="Submit the bonus answer"
+              >
+                Submit bonus
+              </button>
+            </div>
+          )}
         </>
       )}
     </section>

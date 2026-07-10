@@ -24,7 +24,7 @@ import { todaysPuzzle } from "@/lib/puzzles";
 import WordRow from "./WordRow";
 import BonusPanel, { type BonusBankItem } from "./BonusPanel";
 import { HelpModal, StatsModal, WinModal, FailModal } from "./Modals";
-import { IconButton, InfoIcon, StatsIcon, SunIcon, MoonIcon, BulbIcon, ShareIcon, CheckIcon } from "./ui";
+import { IconButton, InfoIcon, StatsIcon, SunIcon, MoonIcon, BulbIcon, ShareIcon } from "./ui";
 
 type Focus = { kind: "word"; i: number } | { kind: "bonus" };
 
@@ -508,13 +508,6 @@ export default function Game() {
   const done = gs.completedAt != null || gs.failed;
   const challenge = gs.mode === "challenge";
 
-  // primary action availability
-  const focusFull =
-    focus.kind === "bonus" || gs.solved.every(Boolean)
-      ? !gs.bonusLetters.includes(null)
-      : focus.kind === "word" && !gs.solved[focus.i] && !gs.placement[focus.i].includes(null);
-  const canCheck = challenge && !done && focusFull;
-
   return (
     <div className="wrap">
       <p className="sr-only" role="status" aria-live="polite">
@@ -572,9 +565,11 @@ export default function Game() {
             focused={focus.kind === "word" && focus.i === i && !gs.solved[i]}
             shaking={shakeWord === i}
             justSolved={justSolved === i}
+            challenge={challenge && !done}
             onFocus={() => setFocus({ kind: "word", i })}
             onPlaceBank={(bi) => placeBank(i, bi)}
             onRemoveSlot={(s) => removeSlot(i, s)}
+            onCommit={() => commitWord(i)}
           />
         ))}
       </div>
@@ -587,11 +582,13 @@ export default function Game() {
           letters={gs.bonusLetters}
           solved={gs.bonusSolved}
           revealed={gs.failed}
+          challenge={challenge && !done}
           focused={focus.kind === "bonus"}
           shaking={shakeBonus}
           onFocus={() => setFocus({ kind: "bonus" })}
           onPlaceBank={placeBonusBank}
           onRemoveSlot={removeBonus}
+          onCommit={commitBonus}
         />
       </div>
 
@@ -605,21 +602,9 @@ export default function Game() {
             <ShareIcon /> View result
           </button>
         ) : (
-          <>
-            <button className="btn btn-ghost flex items-center gap-2" onClick={hint} aria-label="Reveal a letter (costs your grade in Challenge)">
-              <BulbIcon /> Hint
-            </button>
-            {challenge && (
-              <button
-                className="btn btn-primary flex items-center gap-2"
-                onClick={commitFocus}
-                disabled={!canCheck}
-                aria-label="Check the current word or bonus"
-              >
-                <CheckIcon /> Check
-              </button>
-            )}
-          </>
+          <button className="btn btn-ghost flex items-center gap-2" onClick={hint} aria-label="Reveal a letter (costs your grade in Challenge)">
+            <BulbIcon /> Hint
+          </button>
         )}
       </div>
 

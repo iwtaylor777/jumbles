@@ -237,6 +237,38 @@ body {
   background: var(--surface-2);
 }
 
+/* compact inline Submit (appears under a full word / the bonus) */
+.submit-inline {
+  padding: 0.45rem 1.6rem;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+}
+
+@keyframes pulseIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-3px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes nudge {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--tile-shadow);
+  }
+  50% {
+    box-shadow: 0 0 0 5px var(--accent-soft);
+  }
+}
+.pulse {
+  animation:
+    pulseIn 0.18s ease both,
+    nudge 1.6s ease-in-out 0.2s 2;
+}
+
 .iconbtn {
   display: inline-flex;
   align-items: center;

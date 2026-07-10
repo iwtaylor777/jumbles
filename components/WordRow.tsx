@@ -10,10 +10,12 @@ type Props = {
   focused: boolean;
   shaking: boolean;
   justSolved: boolean;
+  challenge: boolean; // show a Submit button when full (Challenge mode)
   index: number;
   onFocus: () => void;
   onPlaceBank: (bankIdx: number) => void;
   onRemoveSlot: (slot: number) => void;
+  onCommit: () => void;
 };
 
 export default function WordRow({
@@ -24,11 +26,14 @@ export default function WordRow({
   focused,
   shaking,
   justSolved,
+  challenge,
   onFocus,
   onPlaceBank,
   onRemoveSlot,
+  onCommit,
 }: Props) {
   const circled = new Set(word.circled);
+  const full = placement.every((x) => x !== null);
 
   // solved (or revealed-on-fail) collapses to a compact row
   if (solved || revealed) {
@@ -103,6 +108,22 @@ export default function WordRow({
           </button>
         ))}
       </div>
+
+      {/* Challenge: a Submit button appears once the word is full */}
+      {challenge && full && (
+        <div className="flex justify-center mt-2.5">
+          <button
+            className="btn btn-primary submit-inline pulse"
+            onClick={(e) => {
+              e.stopPropagation();
+              onCommit();
+            }}
+            aria-label={`Submit ${word.answer.length}-letter word`}
+          >
+            Submit
+          </button>
+        </div>
+      )}
     </div>
   );
 }

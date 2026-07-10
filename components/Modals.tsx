@@ -66,8 +66,8 @@ export function HelpModal({ mode, onClose }: { mode: Mode; onClose: () => void }
         <div className="rule" />
         <div className="text-sm space-y-2" style={{ color: "var(--muted)" }}>
           <p>
-            <b style={{ color: "var(--text)" }}>Challenge</b> — tap <b>Check</b> (or press Enter) to submit
-            a word. Four wrong guesses and you&rsquo;re jumbled. Hints cost your rank.
+            <b style={{ color: "var(--text)" }}>Challenge</b> — fill a word, then tap <b>Submit</b> (or press
+            Enter) to lock it in. Four wrong guesses and you&rsquo;re jumbled. Hints cost your rank.
           </p>
           <p>
             <b style={{ color: "var(--text)" }}>Relaxed</b> — no strikes, free hints, words check themselves.
