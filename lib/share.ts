@@ -1,6 +1,6 @@
 import type { Puzzle } from "./types";
-import type { GameState } from "./storage";
-import { computeRank, isEarlyFlair } from "./score";
+import { MAX_STRIKES, type GameState } from "./storage";
+import { computeRank, isEarlyFlair, elapsedMs, formatDuration } from "./score";
 
 export const SITE_URL = "https://playjumbles.com";
 
@@ -8,7 +8,7 @@ export const SITE_URL = "https://playjumbles.com";
  * Spoiler-free share text that encodes HOW you solved:
  *  - one square per word (green = clean, yellow = used a hint)
  *  - a bonus marker (early ⚡ / clean 🔷 / hinted 🟡 / failed 💀)
- *  - Challenge: the rank + a strikes pip row
+ *  - Challenge: the rank, your time, + a strikes pip row
  */
 export function buildShare(p: Puzzle, s: GameState): string {
   const words = p.words
@@ -24,9 +24,10 @@ export function buildShare(p: Puzzle, s: GameState): string {
 
   if (s.mode === "challenge") {
     const rank = computeRank(s.failed, s.hintsUsed, s.strikes);
-    const pips = "🟥".repeat(s.strikes) + "⬜".repeat(Math.max(0, 4 - s.strikes));
+    const pips = "🟥".repeat(s.strikes) + "⬜".repeat(Math.max(0, MAX_STRIKES - s.strikes));
+    const t = !s.failed && s.completedAt != null ? elapsedMs(s) : null;
     lines.push(`Jumbles No. ${p.id} — ${rank.emoji} ${rank.label}`);
-    lines.push(`${words} ${bonusMark}`);
+    lines.push(`${words} ${bonusMark}${t != null ? ` · ⏱️ ${formatDuration(t)}` : ""}`);
     if (!s.failed) lines.push(`Strikes ${pips}${s.hintsUsed ? `  ·  ${s.hintsUsed} hint${s.hintsUsed > 1 ? "s" : ""}` : ""}`);
   } else {
     lines.push(`Jumbles No. ${p.id} — Relaxed`);

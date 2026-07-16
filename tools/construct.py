@@ -2,16 +2,19 @@
 Jumbles puzzle constructor.
 
 Given a BONUS answer (e.g. "SANDBANK") plus a clue, find 4 distinct common
-5-letter words from data/pool.json and choose circled positions in each so that
-the union of circled letters is exactly the bonus's letter multiset.
+words following the length RAMP (default 5, 5, 6, 7 — the day starts easy and
+gets harder) from data/pool_{L}.json and choose circled positions in each so
+that the union of circled letters is exactly the bonus's letter multiset.
 
 Guarantees (structural, checked here):
   * every word is from the curated unique-anagram pool -> determinate solve
   * circled letters across the 4 words spell the bonus exactly
   * each word contributes 1..3 circled letters (all 4 words matter)
-  * the displayed scramble is not the word itself (and, because each word has a
-    unique anagram in the big dictionary, no permutation of its letters spells a
-    different real word either)
+  * rows are NOT shuffled: the ramp order IS the difficulty curve
+  * the displayed scramble is not the word itself, leaves no letter in its
+    original position when possible, and preserves no 3-letter run of the
+    answer (and, because each word has a unique anagram in the big dictionary,
+    no permutation of its letters spells a different real word either)
 
 Randomised backtracking with restarts; prefers higher-frequency words.
 """
@@ -21,16 +24,25 @@ from pathlib import Path
 import json, random
 
 ROOT = Path(__file__).resolve().parent.parent
-POOL_PATH = ROOT / "data" / "pool.json"
+RAMP = (5, 5, 6, 7)
+
+# The long words are the day's "boss fight": exclude ultra-common fillers
+# (SHOULD, BETWEEN...) there, and randomise deeper into the pool so mid-band
+# words (PUZZLE, WHISTLE, FURIOUS...) appear. Warm-up slots stay easy.
+ZIPF_CAP = {6: 5.2, 7: 5.2}
+JITTER = {4: 80, 5: 80, 6: 300, 7: 450}
 
 _OBSCENE_SUB = ("FUCK", "SHIT", "CUNT", "COCK", "FAG", "NIGG", "SLUT", "TWAT",
                 "DICK", "PISS", "RAPE", "CUM")
 
 
-def load_pool():
-    data = json.loads(POOL_PATH.read_text())
-    # sorted by freq desc already; keep (word, zipf)
-    return [(d["word"], d["zipf"]) for d in data]
+def load_pools(ramp=RAMP):
+    """{length: [(word, zipf)] sorted by freq desc} for each length in the ramp."""
+    pools = {}
+    for length in sorted(set(ramp)):
+        data = json.loads((ROOT / "data" / f"pool_{length}.json").read_text())
+        pools[length] = [(d["word"], d["zipf"]) for d in data]
+    return pools
 
 
 def _distributions(total: int):
@@ -77,11 +89,25 @@ def _positions(word: str, letters: Counter, rng: random.Random):
     return sorted(chosen)
 
 
+def _shares_trigram(s: str, word: str) -> bool:
+    return any(word[i : i + 3] in s for i in range(len(word) - 2))
+
+
+def _leaks_bonus(word: str, bonus: str) -> bool:
+    """True if `word` shares a 4+ letter run with the bonus (WATCHED would
+    telegraph WATCHDOG) or is contained in it outright."""
+    if word in bonus:
+        return True
+    return any(word[i : i + 4] in bonus for i in range(len(word) - 3))
+
+
 def _scramble(word: str, rng: random.Random) -> str:
-    """A permutation that differs from the word, maximising letter displacement."""
+    """A hard permutation: no letter left in place, no 3-letter run of the
+    answer preserved. Falls back to max-displacement if the strict tier is
+    impossible (heavy repeated letters)."""
     best = None
     best_disp = -1
-    for _ in range(60):
+    for attempt in range(400):
         perm = list(word)
         rng.shuffle(perm)
         s = "".join(perm)
@@ -90,12 +116,14 @@ def _scramble(word: str, rng: random.Random) -> str:
         if any(bad in s for bad in _OBSCENE_SUB):
             continue
         disp = sum(1 for i in range(len(word)) if s[i] != word[i])
+        if disp == len(word) and not _shares_trigram(s, word):
+            return s  # strict tier: a derangement with no shared trigram
         if disp > best_disp:
             best_disp, best = disp, s
     return best or word[::-1]
 
 
-def build_puzzle(bonus: str, pool, used_counts: Counter | None = None,
+def build_puzzle(bonus: str, pools, ramp=RAMP, used_counts: Counter | None = None,
                  forbidden: set | None = None, seed: int = 0, restarts: int = 6000):
     """Return (words_meta, warnings) or (None, reason)."""
     bonus = bonus.upper()
@@ -109,20 +137,25 @@ def build_puzzle(bonus: str, pool, used_counts: Counter | None = None,
     dists = _distributions(total)
     rng = random.Random(seed)
 
-    # candidate ordering: common first; drop words used in the batch or that are
-    # a substring of the bonus (e.g. HONEY inside HONEYBEE would give it away)
-    base_order = sorted(
-        (wz for wz in pool if wz[0] not in forbidden and wz[0] not in bonus),
-        key=lambda wz: -wz[1])
-    words_only = [w for w, _ in base_order]
+    # per-length candidate ordering: common first; drop words used in the batch
+    # or that are a substring of the bonus (e.g. HONEY inside HONEYBEE)
+    base_orders = {}
+    for length, pool in pools.items():
+        base = sorted(
+            (wz for wz in pool
+             if wz[0] not in forbidden and not _leaks_bonus(wz[0], bonus)
+             and wz[1] <= ZIPF_CAP.get(length, 99)),
+            key=lambda wz: -wz[1])
+        base_orders[length] = [w for w, _ in base]
 
     for attempt in range(restarts):
         rng2 = random.Random(seed * 100003 + attempt)
         dist = rng2.choice(dists)
         # shuffle candidates but keep common words near the front (weighted)
-        order = words_only[:]
-        # small random perturbation of the freq order
-        order = sorted(order, key=lambda w: words_only.index(w) + rng2.random() * 80)
+        orders = {
+            length: sorted(words, key=lambda w, ws=words: ws.index(w) + rng2.random() * JITTER[length])
+            for length, words in base_orders.items()
+        }
 
         remaining = Counter(target)
         used = set()
@@ -131,7 +164,7 @@ def build_puzzle(bonus: str, pool, used_counts: Counter | None = None,
         for slot in range(4):
             k = dist[slot]
             placed = False
-            for w in order:
+            for w in orders[ramp[slot]]:
                 if w in used:
                     continue
                 sup = _supply(w, remaining)
@@ -173,7 +206,7 @@ def build_puzzle(bonus: str, pool, used_counts: Counter | None = None,
                     got[wm["answer"][i]] += 1
             if got != target:
                 continue
-            rng2.shuffle(words_meta)  # randomise row order
+            # keep ramp order — short warm-ups first, the 7-letter closer last
             return words_meta, None
 
     return None, "no construction found"
@@ -181,9 +214,9 @@ def build_puzzle(bonus: str, pool, used_counts: Counter | None = None,
 
 if __name__ == "__main__":
     import sys
-    pool = load_pool()
+    pools = load_pools()
     bonus = sys.argv[1] if len(sys.argv) > 1 else "SANDBANK"
-    wm, err = build_puzzle(bonus, pool, seed=1)
+    wm, err = build_puzzle(bonus, pools, seed=1)
     if err:
         print("FAIL:", err)
     else:

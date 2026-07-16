@@ -46,7 +46,6 @@ export const viewport: Viewport = {
   ],
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
 };
 
 /** Applies the saved theme before paint to avoid a flash of the wrong theme. */

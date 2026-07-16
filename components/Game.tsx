@@ -13,20 +13,24 @@ import {
   loadMode,
   saveMode,
   emptyStats,
-  freshState,
   MAX_STRIKES,
   type GameState,
   type Stats,
   type Theme,
   type Mode,
 } from "@/lib/storage";
-import { todaysPuzzle } from "@/lib/puzzles";
+import { todaysPuzzle, puzzleForDate } from "@/lib/puzzles";
 import WordRow from "./WordRow";
 import BonusPanel, { type BonusBankItem } from "./BonusPanel";
 import { HelpModal, StatsModal, WinModal, FailModal } from "./Modals";
-import { IconButton, InfoIcon, StatsIcon, SunIcon, MoonIcon, BulbIcon, ShareIcon } from "./ui";
+import { IconButton, InfoIcon, StatsIcon, SunIcon, MoonIcon, BulbIcon, ShareIcon, ClockIcon } from "./ui";
+import { formatDuration } from "@/lib/score";
 
 type Focus = { kind: "word"; i: number } | { kind: "bonus" };
+
+/** The first real move starts the clock. */
+const stampStart = (prev: GameState, next: GameState): GameState =>
+  next !== prev && next.startedAt == null ? { ...next, startedAt: Date.now() } : next;
 
 export default function Game() {
   const [puzzle, setPuzzle] = useState<Puzzle | null>(null);
@@ -56,7 +60,12 @@ export default function Game() {
 
   // ------------------------------------------------------------ mount / load
   useEffect(() => {
-    const p = todaysPuzzle();
+    let p = todaysPuzzle();
+    // dev-only QA override: /?d=2026-07-17 previews that day's puzzle
+    if (process.env.NODE_ENV !== "production") {
+      const d = new URLSearchParams(window.location.search).get("d");
+      if (d && /^\d{4}-\d{2}-\d{2}$/.test(d)) p = puzzleForDate(d);
+    }
     const mode = loadMode();
     const st = loadState(p, mode);
     setPuzzle(p);
@@ -132,8 +141,9 @@ export default function Game() {
   const applyPlaceChar = (prev: GameState, w: number, ch: string): GameState => {
     if (!puzzle || prev.solved[w] || prev.failed) return prev;
     const row = prev.placement[w];
-    for (let k = 0; k < 5; k++)
-      if (puzzle.words[w].scramble[k] === ch && !row.includes(k)) return applyPlaceBank(prev, w, k);
+    const scr = puzzle.words[w].scramble;
+    for (let k = 0; k < scr.length; k++)
+      if (scr[k] === ch && !row.includes(k)) return applyPlaceBank(prev, w, k);
     return prev;
   };
 
@@ -155,7 +165,7 @@ export default function Game() {
   const applyBackspaceWord = (prev: GameState, w: number): GameState => {
     if (prev.solved[w] || prev.failed) return prev;
     const row = [...prev.placement[w]];
-    for (let s = 4; s >= 0; s--)
+    for (let s = row.length - 1; s >= 0; s--)
       if (row[s] !== null) {
         row[s] = null;
         return { ...prev, placement: prev.placement.map((r, i) => (i === w ? row : r)) };
@@ -217,13 +227,14 @@ export default function Game() {
     setGs((cur) => (cur ? fn(cur) : cur));
   }, []);
 
-  const placeBank = (w: number, bankIdx: number) => update((p) => applyPlaceBank(p, w, bankIdx));
+  const placeBank = (w: number, bankIdx: number) =>
+    update((p) => stampStart(p, applyPlaceBank(p, w, bankIdx)));
   const removeSlot = (w: number, slot: number) => update((p) => applyRemoveSlot(p, w, slot));
   const placeBonusBank = (bankIdx: number) =>
     update((p) => {
       const item = bonusBank[bankIdx];
       if (!item?.available || p.bonusSrc.includes(bankIdx)) return p;
-      return applyBonusPlace(p, item.letter, bankIdx);
+      return stampStart(p, applyBonusPlace(p, item.letter, bankIdx));
     });
   const removeBonus = (slot: number) => update((p) => applyRemoveBonus(p, slot));
 
@@ -239,7 +250,7 @@ export default function Game() {
       return;
     const row = gs.placement[w];
     if (row.includes(null)) {
-      setAnnounce("Fill all five letters first.");
+      setAnnounce("Fill all the letters first.");
       return;
     }
     const attempt = row.map((bi) => puzzle.words[w].scramble[bi as number]).join("");
@@ -303,15 +314,16 @@ export default function Game() {
       if (w === -1) return;
       update((p) => {
         const word = puzzle.words[w];
+        const len = word.answer.length;
         const row = [...p.placement[w]];
-        for (let slot = 0; slot < 5; slot++) {
+        for (let slot = 0; slot < len; slot++) {
           const cur = row[slot] === null ? "" : word.scramble[row[slot] as number];
           if (cur === word.answer[slot]) continue;
           const need = word.answer[slot];
           let bi = -1;
-          for (let k = 0; k < 5; k++) if (word.scramble[k] === need && !row.includes(k)) { bi = k; break; }
+          for (let k = 0; k < len; k++) if (word.scramble[k] === need && !row.includes(k)) { bi = k; break; }
           if (bi === -1)
-            for (let k = 0; k < 5; k++)
+            for (let k = 0; k < len; k++)
               if (word.scramble[k] === need) {
                 const at = row.indexOf(k);
                 if (at !== -1) row[at] = null;
@@ -334,7 +346,7 @@ export default function Game() {
           solved = [...p.solved];
           solved[w] = true;
         }
-        return { ...p, placement, hintedWords, hintsUsed: p.hintsUsed + 1, solved };
+        return stampStart(p, { ...p, placement, hintedWords, hintsUsed: p.hintsUsed + 1, solved });
       });
       setFocus({ kind: "word", i: w });
       setAnnounce("Hint used: a letter was revealed.");
@@ -357,7 +369,7 @@ export default function Game() {
         bonusSrc[s] = bankIdx;
         const solvedNow =
           p.mode === "relaxed" && !bonusLetters.includes(null) && bonusLetters.join("") === ans;
-        return {
+        return stampStart(p, {
           ...p,
           bonusLetters,
           bonusSrc,
@@ -365,7 +377,7 @@ export default function Game() {
           hintsUsed: p.hintsUsed + 1,
           bonusSolved: solvedNow ? true : p.bonusSolved,
           solvedCountWhenBonus: solvedNow ? p.solved.filter(Boolean).length : p.solvedCountWhenBonus,
-        };
+        });
       }
       return p;
     });
@@ -393,36 +405,40 @@ export default function Game() {
     prevSolved.current = [...gs.solved];
   }, [gs?.solved]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // relaxed-only: a full-but-wrong word shakes then clears
+  // relaxed-only: a full-but-wrong word shakes (once per arrangement) but keeps
+  // the letters — clearing a 6-7 letter row for one wrong order is too punishing
+  const lastWrongRow = useRef<Record<number, string>>({});
   useEffect(() => {
     if (!gs || gs.mode !== "relaxed") return;
     gs.placement.forEach((row, w) => {
-      if (!gs.solved[w] && !row.includes(null) && shakeWord !== w) {
-        setShakeWord(w);
-        setTimeout(() => {
-          setShakeWord((s) => (s === w ? null : s));
-          update((p) => ({ ...p, placement: p.placement.map((r, i) => (i === w ? Array(5).fill(null) : r)) }));
-        }, 460);
-      }
+      if (gs.solved[w] || row.includes(null)) return;
+      const arrangement = row.join(",");
+      if (lastWrongRow.current[w] === arrangement || shakeWord === w) return;
+      lastWrongRow.current[w] = arrangement;
+      setShakeWord(w);
+      setAnnounce("Not quite — rearrange the letters.");
+      setTimeout(() => setShakeWord((s) => (s === w ? null : s)), 460);
     });
-  }, [gs, shakeWord, update]);
+  }, [gs, shakeWord]);
 
-  // relaxed-only: a full-but-wrong bonus shakes then clears
+  // relaxed-only: a full-but-wrong bonus shakes (once per arrangement), keeps letters
+  const lastWrongBonus = useRef("");
   useEffect(() => {
     if (!gs || gs.mode !== "relaxed" || gs.bonusSolved) return;
-    if (!gs.bonusLetters.includes(null) && !shakeBonus) {
-      setShakeBonus(true);
-      setTimeout(() => {
-        setShakeBonus(false);
-        update((p) => ({ ...p, bonusLetters: p.bonusLetters.map(() => null), bonusSrc: p.bonusSrc.map(() => null) }));
-      }, 460);
-    }
-  }, [gs, shakeBonus, update]);
+    if (gs.bonusLetters.includes(null) || shakeBonus) return;
+    const arrangement = gs.bonusLetters.join(",");
+    if (lastWrongBonus.current === arrangement) return;
+    lastWrongBonus.current = arrangement;
+    setShakeBonus(true);
+    setAnnounce("Not the bonus yet — rearrange the letters.");
+    setTimeout(() => setShakeBonus(false), 460);
+  }, [gs, shakeBonus]);
 
   // win
   useEffect(() => {
     if (!puzzle || !gs || !gs.bonusSolved) return;
-    if (gs.completedAt == null) update((p) => ({ ...p, completedAt: Date.now() }));
+    const finishedAt = gs.completedAt ?? Date.now();
+    if (gs.completedAt == null) update((p) => ({ ...p, completedAt: finishedAt }));
     if (!recorded.current) {
       recorded.current = true;
       const early = (gs.solvedCountWhenBonus ?? 0) < puzzle.words.length;
@@ -432,6 +448,7 @@ export default function Game() {
         hintsUsed: gs.hintsUsed,
         strikes: gs.strikes,
         early,
+        elapsedMs: gs.startedAt != null ? finishedAt - gs.startedAt : null,
       });
       setStats(ns);
       saveStats(ns);
@@ -469,7 +486,7 @@ export default function Game() {
       if (showHelp || showStats || showWin || showFail) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (/^[a-zA-Z]$/.test(e.key)) {
-        update((p) => applyType(p, e.key.toUpperCase(), focusRef.current));
+        update((p) => stampStart(p, applyType(p, e.key.toUpperCase(), focusRef.current)));
         e.preventDefault();
       } else if (e.key === "Backspace") {
         update((p) => {
@@ -500,8 +517,8 @@ export default function Game() {
   }
 
   const dateLabel = new Date(puzzle.date + "T00:00:00").toLocaleDateString(undefined, {
-    weekday: "long",
-    month: "long",
+    weekday: "short",
+    month: "short",
     day: "numeric",
   });
   const dark = document.documentElement.classList.contains("dark");
@@ -541,6 +558,9 @@ export default function Game() {
           {dateLabel} · No. {puzzle.id}
         </span>
         <div className="flex items-center gap-2">
+          {challenge && (
+            <TimerChip startedAt={gs.startedAt} completedAt={gs.completedAt} failed={gs.failed} />
+          )}
           {challenge && !done && <Strikes used={gs.strikes} />}
           <button
             className="modepill"
@@ -613,6 +633,32 @@ export default function Game() {
       {showWin && <WinModal puzzle={puzzle} state={gs} stats={stats} onClose={() => setShowWin(false)} />}
       {showFail && <FailModal puzzle={puzzle} state={gs} stats={stats} onClose={() => setShowFail(false)} />}
     </div>
+  );
+}
+
+function TimerChip({
+  startedAt,
+  completedAt,
+  failed,
+}: {
+  startedAt: number | null;
+  completedAt: number | null;
+  failed: boolean;
+}) {
+  const running = startedAt != null && completedAt == null && !failed;
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!running) return;
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, [running]);
+  if (startedAt == null) return null;
+  const ms = (completedAt ?? now) - startedAt;
+  return (
+    <span className="timerchip" aria-label={`Time: ${formatDuration(ms)}`}>
+      <ClockIcon width={13} height={13} strokeWidth={2.4} />
+      {formatDuration(ms)}
+    </span>
   );
 }
 

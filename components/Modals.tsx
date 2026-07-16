@@ -1,22 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Puzzle } from "@/lib/types";
 import type { GameState, Stats, Mode } from "@/lib/storage";
 import { buildShare } from "@/lib/share";
-import { rankFor, isEarlyFlair } from "@/lib/score";
+import { rankFor, isEarlyFlair, elapsedMs, formatDuration } from "@/lib/score";
 import { msUntilTomorrow } from "@/lib/puzzles";
 import { CloseIcon, ShareIcon } from "./ui";
 
-function Overlay({ onClose, children }: { onClose: () => void; children: React.ReactNode }) {
+function Overlay({
+  onClose,
+  label,
+  children,
+}: {
+  onClose: () => void;
+  label: string;
+  children: React.ReactNode;
+}) {
+  const sheetRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
+    const prev = document.activeElement as HTMLElement | null;
+    sheetRef.current?.focus();
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      prev?.focus?.();
+    };
   }, [onClose]);
   return (
-    <div className="overlay" onClick={onClose} role="dialog" aria-modal="true">
-      <div className="sheet" onClick={(e) => e.stopPropagation()}>
+    <div className="overlay" onClick={onClose} role="dialog" aria-modal="true" aria-label={label}>
+      <div className="sheet" ref={sheetRef} tabIndex={-1} style={{ outline: "none" }} onClick={(e) => e.stopPropagation()}>
         {children}
       </div>
     </div>
@@ -37,12 +51,13 @@ function Header({ title, onClose }: { title: string; onClose: () => void }) {
 // ---------------------------------------------------------------- How to play
 export function HelpModal({ mode, onClose }: { mode: Mode; onClose: () => void }) {
   return (
-    <Overlay onClose={onClose}>
+    <Overlay onClose={onClose} label="How to play">
       <Header title="How to play" onClose={onClose} />
       <div className="px-5 pb-6 space-y-4 text-[0.95rem]" style={{ color: "var(--text)" }}>
         <p style={{ color: "var(--muted)" }}>
-          Unscramble all four words, then use the <b style={{ color: "var(--gold)" }}>circled</b> letters
-          — revealed as you solve — to crack the bonus.
+          Unscramble all four words — they grow longer as you go — then use the{" "}
+          <b style={{ color: "var(--gold)" }}>circled</b> letters, revealed as you solve, to crack
+          the bonus.
         </p>
         <ol className="space-y-3">
           {[
@@ -68,6 +83,7 @@ export function HelpModal({ mode, onClose }: { mode: Mode; onClose: () => void }
           <p>
             <b style={{ color: "var(--text)" }}>Challenge</b> — fill a word, then tap <b>Submit</b> (or press
             Enter) to lock it in. Four wrong guesses and you&rsquo;re jumbled. Hints cost your rank.
+            The clock starts on your first move — share your time and race your friends.
           </p>
           <p>
             <b style={{ color: "var(--text)" }}>Relaxed</b> — no strikes, free hints, words check themselves.
@@ -98,7 +114,7 @@ function Stat({ n, label }: { n: number | string; label: string }) {
 export function StatsModal({ stats, onClose }: { stats: Stats; onClose: () => void }) {
   const winPct = stats.played ? Math.round((stats.wins / stats.played) * 100) : 0;
   return (
-    <Overlay onClose={onClose}>
+    <Overlay onClose={onClose} label="Statistics">
       <Header title="Statistics" onClose={onClose} />
       <div className="px-5 pb-6">
         <div className="grid grid-cols-4 gap-2">
@@ -108,8 +124,9 @@ export function StatsModal({ stats, onClose }: { stats: Stats; onClose: () => vo
           <Stat n={stats.maxStreak} label="Max streak" />
         </div>
         <div className="rule my-5" />
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-4 gap-2">
           <Stat n={stats.flawless} label="Jumble Masters" />
+          <Stat n={stats.bestTimeMs != null ? formatDuration(stats.bestTimeMs) : "—"} label="Best time" />
           <Stat n={stats.earlyBonus} label="Early bonuses" />
           <Stat n={stats.losses} label="Jumbled" />
         </div>
@@ -141,8 +158,9 @@ function ShareButton({ puzzle, state }: { puzzle: Puzzle; state: GameState }) {
         await navigator.share({ text });
         return;
       }
-    } catch {
-      /* cancelled */
+    } catch (e) {
+      // a deliberate cancel shouldn't silently copy instead
+      if ((e as DOMException)?.name === "AbortError") return;
     }
     try {
       await navigator.clipboard.writeText(text);
@@ -186,9 +204,12 @@ export function WinModal({
 }) {
   const rank = rankFor(state);
   const early = isEarlyFlair(state, puzzle.words.length);
+  const time = state.mode === "challenge" && state.completedAt != null ? elapsedMs(state) : null;
+  const isNewBest = time != null && stats.bestTimeMs != null && time <= stats.bestTimeMs;
+  // (recordResult ran before this modal opened, so equalling the best means we set it)
 
   return (
-    <Overlay onClose={onClose}>
+    <Overlay onClose={onClose} label="Puzzle solved">
       <div className="px-6 pt-7 pb-6 text-center">
         <p className="text-[0.7rem] font-bold tracking-[0.18em] uppercase" style={{ color: "var(--gold)" }}>
           Bonus
@@ -209,6 +230,16 @@ export function WinModal({
               {rank.blurb}
               {early ? ` · early bonus` : ""}
             </p>
+            {time != null && (
+              <p className="mt-2 text-sm font-bold tabular-nums">
+                ⏱️ {formatDuration(time)}
+                {isNewBest ? (
+                  <span style={{ color: "var(--gold)" }}> · best time!</span>
+                ) : stats.bestTimeMs != null ? (
+                  <span style={{ color: "var(--muted)" }}> · best {formatDuration(stats.bestTimeMs)}</span>
+                ) : null}
+              </p>
+            )}
           </>
         ) : (
           <>
@@ -245,7 +276,7 @@ export function FailModal({
   onClose: () => void;
 }) {
   return (
-    <Overlay onClose={onClose}>
+    <Overlay onClose={onClose} label="Out of strikes">
       <div className="px-6 pt-7 pb-6 text-center">
         <div className="scatter text-4xl" aria-hidden>
           🤪

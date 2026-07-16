@@ -1,24 +1,29 @@
 """
-Generate the Jumbles launch batch.
+Generate / extend the Jumbles puzzle batch.
 
 I (as constructor/editor) supply the creative part -- a bonus answer + a witty
-clue.  construct.py finds 4 common words + circled positions that spell it.
+clue.  construct.py finds 4 common words (following the 5,5,6,7 length ramp:
+warm-ups first, the long word last) + circled positions that spell the bonus.
 Every puzzle is then re-validated before it ships.
 
-Writes app-importable  data/puzzles.json  (array, one per day from START_DATE).
+Puzzles dated on or before KEEP_THROUGH are preserved exactly as already
+published (players may have seen or be mid-way through them); later dates are
+(re)generated from the remaining seeds.
+
+Writes app-importable  data/puzzles.json  (array, one per day).
 """
 from __future__ import annotations
 from collections import Counter
 from pathlib import Path
 import json, datetime as dt
 
-from construct import load_pool, build_puzzle, POOL_PATH
+from construct import load_pools, build_puzzle, RAMP
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "data" / "puzzles.json"
 BIGDICT = ROOT / "data" / "words_alpha.txt"
-START_DATE = dt.date(2026, 7, 9)
-WANT = 35
+START_DATE = dt.date(2026, 7, 9)      # day 1 (only used if OUT doesn't exist)
+KEEP_THROUGH = dt.date(2026, 7, 16)   # never rewrite puzzles up to this date
 NO_REPEAT_WINDOW = 12  # a word won't reappear within this many days
 
 # (bonus display, clue).  Display spaces define the answer's word pattern.
@@ -78,16 +83,19 @@ def load_big():
     return {w.strip() for w in BIGDICT.read_text(encoding="latin-1").splitlines()}
 
 
-def validate(puz, pool_words, big):
+def validate(puz, pools_words, big, expect_ramp=True):
     """Return list of problems (empty = valid)."""
     probs = []
     letters = "".join(c for c in puz["bonus"]["answer"] if c.isalpha())
     got = Counter()
     seen = set()
-    for w in puz["words"]:
+    for slot, w in enumerate(puz["words"]):
         ans = w["answer"]
-        if ans not in pool_words:
-            probs.append(f"{ans} not in pool")
+        if expect_ramp:
+            if len(ans) != RAMP[slot]:
+                probs.append(f"{ans} length {len(ans)} != ramp slot {RAMP[slot]}")
+            if ans not in pools_words.get(len(ans), set()):
+                probs.append(f"{ans} not in pool_{len(ans)}")
         if ans in seen:
             probs.append(f"duplicate word {ans}")
         seen.add(ans)
@@ -106,24 +114,39 @@ def validate(puz, pool_words, big):
 
 
 def main():
-    pool = load_pool()
-    pool_words = {w for w, _ in pool}
+    pools = load_pools()
+    pools_words = {length: {w for w, _ in pool} for length, pool in pools.items()}
     big = load_big()
 
-    puzzles = []
+    # preserve everything already published
+    kept = []
+    if OUT.exists():
+        kept = [p for p in json.loads(OUT.read_text())
+                if dt.date.fromisoformat(p["date"]) <= KEEP_THROUGH]
+    kept_displays = {p["bonus"]["display"] for p in kept}
+
+    puzzles = list(kept)
     used = Counter()
-    recent_words: list[set] = []  # words used per puzzle, for the rolling window
-    date = START_DATE
-    num = 1
-    log = []
+    recent_words: list[set] = [{w["answer"] for w in p["words"]} for p in kept]
+    for words in recent_words:
+        for w in words:
+            used[w] += 1
+
+    if kept:
+        date = dt.date.fromisoformat(kept[-1]["date"]) + dt.timedelta(days=1)
+        num = kept[-1]["id"] + 1
+    else:
+        date, num = START_DATE, 1
+
+    log = [f"KEPT #{p['id']} {p['date']}  {p['bonus']['display']}" for p in kept]
 
     for i, (display, clue) in enumerate(SEEDS):
-        if len(puzzles) >= WANT:
-            break
+        if display in kept_displays:
+            continue
         answer = "".join(display.split()).upper()
         pattern = [len(p) for p in display.split()]
         forbidden: set = set().union(*recent_words[-NO_REPEAT_WINDOW:]) if recent_words else set()
-        words_meta, err = build_puzzle(answer, pool, used_counts=used,
+        words_meta, err = build_puzzle(answer, pools, used_counts=used,
                                        forbidden=forbidden, seed=1000 + i)
         if err:
             log.append(f"SKIP {display}: {err}")
@@ -135,7 +158,7 @@ def main():
             "bonus": {"answer": answer, "display": display, "clue": clue,
                       "pattern": pattern},
         }
-        probs = validate(puz, pool_words, big)
+        probs = validate(puz, pools_words, big)
         if probs:
             log.append(f"REJECT {display}: {probs}")
             continue
@@ -150,7 +173,9 @@ def main():
 
     OUT.write_text(json.dumps(puzzles, indent=2))
     print("\n".join(log))
-    print(f"\nGenerated {len(puzzles)} puzzles -> {OUT.relative_to(ROOT)}")
+    print(f"\nTotal {len(puzzles)} puzzles ({len(kept)} kept, "
+          f"{len(puzzles) - len(kept)} generated) -> {OUT.relative_to(ROOT)}")
+    print(f"Runway: {puzzles[0]['date']} -> {puzzles[-1]['date']}")
     # word reuse summary
     top = used.most_common(8)
     print("most reused words:", top)

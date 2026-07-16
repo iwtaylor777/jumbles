@@ -1,5 +1,17 @@
 {
-  "freq_min": 3.6,
-  "pool_size": 418,
-  "big_dict_anagram_classes": 10187
+  "5": {
+    "freq_min": 3.6,
+    "pool_size": 415,
+    "big_dict_anagram_classes": 10187
+  },
+  "6": {
+    "freq_min": 3.4,
+    "pool_size": 702,
+    "big_dict_anagram_classes": 21164
+  },
+  "7": {
+    "freq_min": 3.4,
+    "pool_size": 910,
+    "big_dict_anagram_classes": 33219
+  }
 }

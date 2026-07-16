@@ -6,7 +6,7 @@
   --surface: #fffdf8;
   --surface-2: #efe9dd;
   --text: #1c1b18;
-  --muted: #7a746b;
+  --muted: #6a6459; /* ≥4.5:1 on --bg and --surface-2 (WCAG AA) */
   --line: #e2dccf;
   --tile: #fffdf8;
   --tile-line: #ccc4b4;
@@ -189,13 +189,47 @@ body {
   pointer-events: none;
 }
 
+/* rows with --n tiles shrink their cells so long words fit narrow screens;
+   the calc mirrors .wrap's metrics (max-width 30rem, 1rem side padding, 0.375rem gaps) */
+.fit {
+  --cap: var(--tile-size);
+  --pad: 2rem;
+  --cell: min(
+    var(--cap),
+    calc((min(100vw, 30rem) - var(--pad) - (var(--n, 5) - 1) * 0.375rem) / var(--n, 5))
+  );
+}
+/* bonus slots sit inside the padded bonus card and may span two word groups */
+.bonusfit {
+  --cap: calc(var(--tile-size) * 0.9);
+  --pad: 4.25rem;
+}
+.fit .slot {
+  width: var(--cell);
+  height: var(--cell);
+  font-size: calc(var(--cell) * 0.46);
+}
+.fit .chip {
+  width: min(var(--chip-size), var(--cell));
+  height: min(var(--chip-size), var(--cell));
+  font-size: calc(min(var(--chip-size), var(--cell)) * 0.44);
+}
+
 /* -------------------------------------------------------------------- rows */
 .wordcard {
   border-radius: 16px;
   transition: opacity 0.2s ease;
 }
-.wordcard.focused .slotrow {
-  outline: none;
+
+/* the slot that will receive the next letter (focused row / bonus) */
+.slot.active {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus) 28%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
 }
 
 .solvedrow {
@@ -301,6 +335,17 @@ body {
 }
 .modepill:hover {
   background: var(--surface-2);
+}
+
+/* timer chip */
+.timerchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
 }
 
 /* strike pips */

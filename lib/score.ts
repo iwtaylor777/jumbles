@@ -32,6 +32,22 @@ export function rankFor(gs: GameState): Rank | null {
   return computeRank(gs.failed, gs.hintsUsed, gs.strikes);
 }
 
+/** Elapsed solve time in ms (null until the first move is made). */
+export function elapsedMs(gs: GameState): number | null {
+  if (gs.startedAt == null) return null;
+  return Math.max(0, (gs.completedAt ?? Date.now()) - gs.startedAt);
+}
+
+/** 73_000 -> "1:13"; 3_673_000 -> "1:01:13" */
+export function formatDuration(ms: number): string {
+  const total = Math.max(0, Math.round(ms / 1000));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
+}
+
 export function isEarlyFlair(gs: GameState, wordCount: number): boolean {
   return (
     gs.bonusSolved &&

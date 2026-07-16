@@ -34,11 +34,12 @@ export default function WordRow({
 }: Props) {
   const circled = new Set(word.circled);
   const full = placement.every((x) => x !== null);
+  const rowVars = { "--n": word.answer.length } as React.CSSProperties;
 
   // solved (or revealed-on-fail) collapses to a compact row
   if (solved || revealed) {
     return (
-      <div className="solvedrow py-1.5" aria-label={`${solved ? "Solved" : "Answer"}: ${word.answer}`}>
+      <div className="solvedrow fit py-1.5" style={rowVars} aria-label={`${solved ? "Solved" : "Answer"}: ${word.answer}`}>
         <span className={solved ? "text-accent shrink-0" : "shrink-0"} style={solved ? undefined : { color: "var(--muted)" }} aria-hidden>
           {solved ? (
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
@@ -52,9 +53,9 @@ export default function WordRow({
               key={i}
               className={`tile slot ${solved ? "solved" : "revealed"}${circled.has(i) ? " circled" : ""}${justSolved && solved && circled.has(i) ? " pop" : ""}`}
               style={{
-                width: "calc(var(--tile-size) * 0.82)",
-                height: "calc(var(--tile-size) * 0.82)",
-                fontSize: "calc(var(--tile-size) * 0.38)",
+                width: "calc(var(--cell) * 0.82)",
+                height: "calc(var(--cell) * 0.82)",
+                fontSize: "calc(var(--cell) * 0.38)",
               }}
             >
               {ch}
@@ -68,15 +69,16 @@ export default function WordRow({
   const bankUsed = new Set(placement.filter((x): x is number => x !== null));
 
   return (
-    <div className={`wordcard${focused ? " focused" : ""} ${shaking ? "shake" : ""}`} onClick={onFocus}>
+    <div className={`wordcard fit${focused ? " focused" : ""} ${shaking ? "shake" : ""}`} style={rowVars} onClick={onFocus}>
       {/* answer slots — circled positions are hidden until the word is solved */}
       <div className="flex gap-1.5 justify-center">
         {placement.map((bankIdx, slot) => {
           const letter = bankIdx === null ? "" : word.scramble[bankIdx];
+          const active = focused && bankIdx === null && placement.indexOf(null) === slot;
           return (
             <button
               key={slot}
-              className={`tile slot${letter ? " filled" : ""}`}
+              className={`tile slot${letter ? " filled" : ""}${active ? " active" : ""}`}
               onClick={(e) => {
                 e.stopPropagation();
                 if (letter) onRemoveSlot(slot);

@@ -80,20 +80,19 @@ export default function BonusPanel({
       ) : (
         <>
           {/* bonus slots */}
-          <div className="flex gap-2 justify-center flex-wrap">
+          <div
+            className="fit bonusfit flex gap-2 justify-center flex-wrap"
+            style={{ "--n": letters.length } as React.CSSProperties}
+          >
             {groups.map((g, gi) => (
               <div key={gi} className="flex gap-1.5">
                 {g.map((slot) => {
                   const l = letters[slot];
+                  const active = focused && l === null && letters.indexOf(null) === slot;
                   return (
                     <button
                       key={slot}
-                      className={`tile slot${l ? " filled" : ""}`}
-                      style={{
-                        width: "calc(var(--tile-size) * 0.9)",
-                        height: "calc(var(--tile-size) * 0.9)",
-                        fontSize: "calc(var(--tile-size) * 0.42)",
-                      }}
+                      className={`tile slot${l ? " filled" : ""}${active ? " active" : ""}`}
                       onClick={(e) => {
                         e.stopPropagation();
                         if (l) onRemoveSlot(slot);
@@ -146,6 +145,12 @@ export default function BonusPanel({
               ),
             )}
           </div>
+
+          {bank.every((b) => !b.available) && (
+            <p className="text-center mt-3 text-[0.78rem]" style={{ color: "var(--muted)" }}>
+              Solve words above and their circled letters drop in here.
+            </p>
+          )}
 
           {challenge && full && (
             <div className="flex justify-center mt-4">
